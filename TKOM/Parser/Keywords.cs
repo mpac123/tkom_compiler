@@ -30,7 +30,8 @@ namespace TKOM.Parser
                     {'[', TokenType.SquareBracketOpen},
                     {']', TokenType.SquareBracketClose},
                     {'>', TokenType.GreaterThan},
-                    {'<', TokenType.LessThan}
+                    {'<', TokenType.LessThan},
+                    {'"', TokenType.QuotationMark}
                 };
 
         public static Dictionary<char, Dictionary<char, TokenType>> FollowedSignDict

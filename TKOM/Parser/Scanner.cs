@@ -6,10 +6,10 @@ namespace TKOM.Parser
 {
     public class Scanner
     {
-        private readonly StreamReader _streamReader;
+        private readonly Reader _reader;
         public Scanner(StreamReader streamReader)
         {
-            _streamReader = streamReader;
+            _reader = new Reader(streamReader);
         }
         public Token Token { private set; get; }
         public void ReadNextToken()
@@ -37,45 +37,47 @@ namespace TKOM.Parser
 
         private void SkipWhitespaces()
         {
-            while (_streamReader.Peek() == ' ' 
-                || _streamReader.Peek() == '\n'
-                || _streamReader.Peek() == '\r')
+            while (_reader.Peek() == ' ' 
+                || _reader.Peek() == '\n'
+                || _reader.Peek() == '\r')
             {
-                _streamReader.Read();
+                _reader.Read();
+                _reader.ClearBuffer();
             }
         }
 
         private bool ReadKeyword()
         {
             string buffer = "";
-            if (_streamReader.Peek() == '<'         // def, for, if, else
-                || _streamReader.Peek() == 'n'      // not
-                || _streamReader.Peek() == 'i')     // in
+            if (_reader.Peek() == '<'         // def, for, if, else
+                || _reader.Peek() == 'n'      // not
+                || _reader.Peek() == 'i')     // in
             {
                 do
                 {
-                    buffer += (char) _streamReader.Read();
+                    buffer += (char) _reader.Read();
                 }
-                while (IsLetter() || _streamReader.Peek() == '/' || _streamReader.Peek() == ':');
-                if (_streamReader.Peek() == '>')
+                while (IsLetter() || _reader.Peek() == '/' || _reader.Peek() == ':');
+                if (_reader.Peek() == '>')
                 {
-                    buffer += (char) _streamReader.Read();
+                    buffer += (char) _reader.Read();
                 }
-                else if (_streamReader.Peek() != ' ')
+                else if (_reader.Peek() != ' ')
                 {
                     // there must be a space after keywords that do not end with '>',
                     // we can't accept keywords such as 'in?' or '<:def!'
-                    Rewind(buffer.Length);
+                    _reader.Rewind(buffer.Length);
                     return false;
                 }
                 TokenType tokenType;
                 if (Keywords.KeywordDict.TryGetValue(buffer, out tokenType))
                 {
+                    _reader.ClearBuffer();
                     Token = new Token(tokenType);
                     return true;
                 }
             }
-            Rewind(buffer.Length);
+            _reader.Rewind(buffer.Length);
             return false;
         }
 
@@ -83,27 +85,29 @@ namespace TKOM.Parser
         {
             Dictionary<char, TokenType> possibleFollowingSignsDict;
             string buffer = "";
-            if (Keywords.FollowedSignDict.TryGetValue((char)_streamReader.Peek(), out possibleFollowingSignsDict))
+            if (Keywords.FollowedSignDict.TryGetValue((char)_reader.Peek(), out possibleFollowingSignsDict))
             {
-                buffer += (char)_streamReader.Read();
+                buffer += (char)_reader.Read();
                 TokenType twoSignTokenType;
-                if (possibleFollowingSignsDict.TryGetValue((char)_streamReader.Peek(), out twoSignTokenType))
+                if (possibleFollowingSignsDict.TryGetValue((char)_reader.Peek(), out twoSignTokenType))
                 {
-                    _streamReader.Read();
+                    _reader.Read();
+                    _reader.ClearBuffer();
                     Token = new Token(twoSignTokenType);
                     return true;
                 }
             }
-            Rewind(buffer.Length);
+            _reader.Rewind(buffer.Length);
             return false;
         }
 
         private bool ReadSpecialOneCharSign()
         {
             TokenType tokenType;
-            if (Keywords.SignDict.TryGetValue((char)_streamReader.Peek(), out tokenType))
+            if (Keywords.SignDict.TryGetValue((char)_reader.Peek(), out tokenType))
             {
-                _streamReader.Read();
+                _reader.Read();
+                _reader.ClearBuffer();
                 Token = new Token(tokenType);
                 return true;
             }
@@ -118,38 +122,41 @@ namespace TKOM.Parser
                 string buffer = "";
                 do
                 {
-                    buffer += (char) _streamReader.Read();
+                    buffer += (char) _reader.Read();
                 }
                 while (IsDigit());
-                if (_streamReader.Peek() == '.' || _streamReader.Peek() == ' '
-                    || _streamReader.Peek() == ')')
+                if (_reader.Peek() == '.' || _reader.Peek() == ' '
+                    || _reader.Peek() == ')' || _reader.Peek() == ']')
                 {
+                    _reader.ClearBuffer();
                     Token = new Token(TokenType.Number, buffer);
                     return true;
                 }
-                Rewind(buffer.Length);
+                _reader.Rewind(buffer.Length);
             }
             return false;
         }
 
         private bool ReadIdentifier()
         {
-            if (IsLetter() || _streamReader.Peek() == '_')
+            if (IsLetter() || _reader.Peek() == '_')
             {
                 string buffer = "";
                 do
                 {
-                    buffer += (char) _streamReader.Read();
+                    buffer += (char) _reader.Read();
                 }
                 while (IsAllowedInIdentifierChar());
-                if (_streamReader.Peek() == '.' || _streamReader.Peek() == '['
-                    || _streamReader.Peek() == ' ' || _streamReader.Peek() == ')'
-                    || _streamReader.Peek() == '(' || _streamReader.Peek() == ',')
+                if (_reader.Peek() == '.' || _reader.Peek() == '['
+                    || _reader.Peek() == ' ' || _reader.Peek() == ')'
+                    || _reader.Peek() == '(' || _reader.Peek() == ','
+                    || _reader.Peek() == '}')
                 {
+                    _reader.ClearBuffer();
                     Token = new Token(TokenType.Identifier, buffer);
                     return true;
                 }
-                Rewind(buffer.Length);
+                _reader.Rewind(buffer.Length);
             }
             return false;
         }
@@ -160,16 +167,17 @@ namespace TKOM.Parser
             do
             {
                 EscapeCharacterIfNeeded();
-                buffer += (char) _streamReader.Read();
+                buffer += (char) _reader.Read();
             }
             while (IsAllowedInText());
+            _reader.ClearBuffer();
             Token = new Token(TokenType.Text, buffer);
             return true;
         }
 
         private bool ReadEof()
         {
-            if (_streamReader.Peek() == -1)
+            if (_reader.IsEndOfStream())
             {
                 Token = new Token(TokenType.Eof);
                 return true;
@@ -179,24 +187,24 @@ namespace TKOM.Parser
 
         private void EscapeCharacterIfNeeded()
         {
-            if (_streamReader.Peek() == '\\')
+            if (_reader.Peek() == '\\')
             {
-                _streamReader.Read();
-                if (!(_streamReader.Peek() == '{'
-                 || _streamReader.Peek() == '<'
-                 || _streamReader.Peek() == '}'
-                 || _streamReader.Peek() == '>'
-                 || _streamReader.Peek() == '"'
-                 || _streamReader.Peek() == '\\'))
+                _reader.Read();
+                if (!(_reader.Peek() == '{'
+                 || _reader.Peek() == '<'
+                 || _reader.Peek() == '}'
+                 || _reader.Peek() == '>'
+                 || _reader.Peek() == '"'
+                 || _reader.Peek() == '\\'))
                 {
-                    Rewind(1);
+                    _reader.Rewind(1);
                 }
             }
         }
 
         private bool IsLetter()
         {
-            var peeked_char = _streamReader.Peek();
+            var peeked_char = _reader.Peek();
             if ((peeked_char >= 'A' && peeked_char <= 'Z')
                 || (peeked_char >= 'a' && peeked_char <= 'z'))
             {
@@ -207,7 +215,7 @@ namespace TKOM.Parser
 
         private bool IsDigit()
         {
-            var peeked_char = _streamReader.Peek();
+            var peeked_char = _reader.Peek();
             if ((peeked_char >= '0' && peeked_char <= '9'))
             {
                 return true;
@@ -217,7 +225,7 @@ namespace TKOM.Parser
 
         private bool IsAllowedInIdentifierChar()
         {
-            var peeked_char = _streamReader.Peek();
+            var peeked_char = _reader.Peek();
             if (IsLetter() || IsDigit() || peeked_char == '_' || peeked_char == '-')
             {
                 return true;
@@ -227,7 +235,7 @@ namespace TKOM.Parser
 
         private bool IsAllowedInText()
         {
-            var peeked_char = _streamReader.Peek();
+            var peeked_char = _reader.Peek();
             // if it starts with special sign (function definitions, if expressions etc
             // are included since they all start with '<' which is a special sign itself)
             if (peeked_char == -1 || Keywords.SignDict.ContainsKey((char)peeked_char)
@@ -238,10 +246,5 @@ namespace TKOM.Parser
             return true;
         }
 
-
-        private void Rewind(int bufferLength)
-        {
-            _streamReader.BaseStream.Seek(-bufferLength, SeekOrigin.Current);
-        }
     }
 }
