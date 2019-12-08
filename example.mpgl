@@ -1,0 +1,40 @@
+<:def row(asteroid, color)>
+    <tr>
+        <td style="color:{color}">{asteroid.name}</td>
+        <td><a href="{asteroid.nasa_jpl_url}">Url</a></td>
+        <td>
+            <:if (asteroid.relative_velocity_km_s > 15.0)>
+                <b>{asteroid.relative_velocity_km_s}</b>
+            </:if>
+            <:else>
+                {asteroid.relative_velocity_km_s}
+            </:else>
+        </td>
+        <td>{asteroid.estimated_diameter_min_meters} 
+            - {asteroid.estimated_diameter_max_meters}</td>
+        <td>{asteroid.miss_distance_lunar}</td>
+    </tr>
+</:def>
+
+<:def main(model)>
+    <!DOCTYPE html> 
+    <meta charset="utf-8"> 
+    <header>
+        <h1>Asteroids - close approaches to Earth</h1>
+        <h2>{model.date}</h2>
+    </header>
+    <body>
+        <div>
+            <table>
+                <:for (asteroid in model.asteroids)>
+                    <:if (a.is_potentially_hazardous_asteroid)>
+                        {row(asteroid, "red")}
+                    </:if>
+                    <:else>
+                        {row(asteroid, "black")}
+                    </:else>
+                </:for>
+            </table>
+        </div>
+    </body>
+</:def>
