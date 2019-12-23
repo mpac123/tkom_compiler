@@ -1,17 +1,19 @@
-namespace TKOM.Parser
+namespace TKOM.Utils
 {
     public class Token
     {
         public enum TokenType {
             Text,
             Number,
-            Identifier,        // '\' - used as an escape character
+            Identifier,        
             CurlyBracketOpen,
             CurlyBracketClose,
             ParenthesisOpen,
             ParenthesisClose,
             Coma,
             Dot,
+            ExclamationMark,
+            AssignmentMark,
             QuotationMark,
             SquareBracketOpen,
             SquareBracketClose,
@@ -20,16 +22,14 @@ namespace TKOM.Parser
             GreaterEqualThan,
             LessEqualThan,
             Equal,
-            FunctionOpen,       // <:def
-            FunctionClose,      // </:def>
-            ForExprOpen,        // <:for
-            ForExprClose,       // </:for>
-            IfExprOpen,         // <:if
-            IfExprClose,        // </:if>
-            ElseExprOpen,       // <:else>
-            ElseExprClose,       // </:else>
+            NotEqual,
+            TagClose,           // </
+            TagCloseInline,     // />
+            Def,                // :def
+            For,                // :for
+            If,                 // :if
+            Else,               // :else
             In,
-            Not,
             Eof,
             Invalid
 

@@ -1,559 +1,737 @@
 using Xunit;
-using TKOM.Test.Tools.StreamGenerator;
-using TKOM.Parser;
-using System.IO;
-using static TKOM.Parser.Token;
-using System.Collections.Generic;
+using static TKOM.Utils.Token;
+using TKOM.Readers;
+using TKOM.Utils;
+using TKOM.Tools;
 
 namespace TKOM.Test.Parser
 {
     public class ScannerTest
     {
         [Fact]
-        public void ReadsEof()
+        public void EmptyStream_ReadsNextToken_TokenIsEof()
         {
-            using (var stream = StreamGenerator.GenerateStreamFromString(""))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("");
+            var scanner = new Scanner(reader);
 
-                // act
+            // act
+            scanner.ReadNextToken();
+            var token = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.Eof, token.Type);
+        }
+
+        [Fact]
+        public void StreamWithTagOpen_ReadsNextToken_TokenIsLessThan()
+        {
+            // prepare
+            var reader = new StringsReader("<:def");
+            var scanner = new Scanner(reader);
+
+            // act
+            scanner.ReadNextToken();
+            var first_token = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.LessThan, first_token.Type);
+        }
+
+        [Fact]
+        public void StreamWithDefKeyword_ReadsNextToken_TokenIsDef()
+        {
+            // prepare
+            var reader = new StringsReader(":def");
+            var scanner = new Scanner(reader);
+
+            // act
+            scanner.ReadNextToken();
+            var first_token = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.Def, first_token.Type);
+        }
+
+        [Fact]
+        public void StreamWithDefTagOpen_ReadsNextTokenTwice_TokensAreIsLessThanAndDef()
+        {
+            // prepare
+            var reader = new StringsReader("<:def");
+            var scanner = new Scanner(reader);
+
+            // act
+            scanner.ReadNextToken();
+            var first_token = scanner.Token;
+            scanner.ReadNextToken();
+            var second_token = scanner.Token;
+            scanner.ReadNextToken();
+            var third_token = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.LessThan, first_token.Type);
+            Assert.Equal(TokenType.Def, second_token.Type);
+            Assert.Equal(TokenType.Eof, third_token.Type);
+        }
+
+        [Fact]
+        public void StreamWithDefTagClose_ReadsNextTokenThreeTimes_TokensAreTagCloseAndDefAndGreaterThan()
+        {
+            // prepare
+            var reader = new StringsReader("</:def>");
+            var scanner = new Scanner(reader);
+
+            // act
+            scanner.ReadNextToken();
+            var first_token = scanner.Token;
+            scanner.ReadNextToken();
+            var second_token = scanner.Token;
+            scanner.ReadNextToken();
+            var third_token = scanner.Token;
+            scanner.ReadNextToken();
+            var fourth_token = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.TagClose, first_token.Type);
+            Assert.Equal(TokenType.Def, second_token.Type);
+            Assert.Equal(TokenType.GreaterThan, third_token.Type);
+            Assert.Equal(TokenType.Eof, fourth_token.Type);
+        }
+
+        [Fact]
+        public void StreamWithFunHeaderWithOneArg_ReadNextTokenTillEof_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader(@"<:def function(arg1)>");
+            var scanner = new Scanner(reader);
+
+            // act
+            int size_array = 8;
+            Token[] array_of_tokens = new Token[size_array];
+            for (int i = 0; i < size_array; i++)
+            {
                 scanner.ReadNextToken();
-                var token = scanner.Token;
-
-                // validate
-                Assert.Equal(TokenType.Eof, token.Type);
+                array_of_tokens[i] = scanner.Token;
             }
+
+            // validate
+            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.Def, array_of_tokens[1].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
+            Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[3].Type);
+
+            Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
+            Assert.Equal("arg1", array_of_tokens[4].Value);
+
+            Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[5].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
+
+            Assert.Equal(TokenType.Eof, array_of_tokens[7].Type);
         }
 
         [Fact]
-        public void ReadsFunctionOpenToken()
+        public void StreamWithFunHeaderAndBody_ReadTokensAndText_TokensAreCorrect()
         {
-            using (var stream = StreamGenerator.GenerateStreamFromString("<:def "))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
 
-                // act
+            // prepare
+            var reader = new StringsReader("<:def function(arg1)>\nwhatever inside\n</:def>");
+            var scanner = new Scanner(reader);
+
+            // act
+            var array_size = 12;
+            Token[] array_of_tokens = new Token[array_size];
+            for (int i = 0; i < array_size; i++)
+            {
+                if (i == 7)
+                {
+                    scanner.TryReadText();
+                }
+                else
+                {
+                    scanner.ReadNextToken();
+                }
+                array_of_tokens[i] = scanner.Token;
+            }
+
+            // validate
+            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.Def, array_of_tokens[1].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
+            Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[3].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
+            Assert.Equal("arg1", array_of_tokens[4].Value);
+            Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[5].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
+            Assert.Equal(TokenType.Text, array_of_tokens[7].Type);
+            Assert.Equal("\nwhatever inside\n", array_of_tokens[7].Value);
+            Assert.Equal(TokenType.TagClose, array_of_tokens[8].Type);
+            Assert.Equal(TokenType.Def, array_of_tokens[9].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[10].Type);
+            Assert.Equal(TokenType.Eof, array_of_tokens[11].Type);
+        }
+
+        [Fact]
+        public void StreamWithFunHeaderWithManyArgs_ReadNextTokenTillEof_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("<:def function(arg1, _arg2, _3)>");
+            var scanner = new Scanner(reader);
+
+            // act
+            int size_array = 12;
+            Token[] array_of_tokens = new Token[size_array];
+            for (int i = 0; i < size_array; i++)
+            {
                 scanner.ReadNextToken();
-                var first_token = scanner.Token;
+                array_of_tokens[i] = scanner.Token;
+            }
+
+            // validate
+            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.Def, array_of_tokens[1].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
+            Assert.Equal("function", array_of_tokens[2].Value);
+            Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[3].Type);
+
+            Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
+            Assert.Equal("arg1", array_of_tokens[4].Value);
+
+            Assert.Equal(TokenType.Coma, array_of_tokens[5].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[6].Type);
+            Assert.Equal("_arg2", array_of_tokens[6].Value);
+
+            Assert.Equal(TokenType.Coma, array_of_tokens[7].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[8].Type);
+            Assert.Equal("_3", array_of_tokens[8].Value);
+
+            Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[9].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[10].Type);
+
+            Assert.Equal(TokenType.Eof, array_of_tokens[11].Type);
+        }
+
+        [Fact]
+        public void StreamWithFunHeaderAndBodyWithHtmlTag_ReadTokensAndText_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("<:def function()>\n<h>HTML inside</h>\n</:def>");
+            for (int i = 0; i < 17; i++)
+            {
+                reader.Read();  // so that position is at \n after fun declaration...
+            }
+            var scanner = new Scanner(reader);
+
+            // act
+            var isText = scanner.TryReadText();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+            scanner.TryReadText();
+            var fifthToken = scanner.Token;
+
+            // validate
+            Assert.True(isText);
+            Assert.Equal(TokenType.Text, firstToken.Type);
+            Assert.Equal("\n", firstToken.Value);
+            Assert.Equal(TokenType.LessThan, secondToken.Type);
+            Assert.Equal(TokenType.Identifier, thirdToken.Type);
+            Assert.Equal("h", thirdToken.Value);
+            Assert.Equal(TokenType.GreaterThan, forthToken.Type);
+            Assert.Equal(TokenType.Text, fifthToken.Type);
+            Assert.Equal("HTML inside", fifthToken.Value);
+
+        }
+
+        [Fact]
+        public void StreamWithFunBodyWithEscapeChars_ReadTokensAndText_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("<:def function()>\n\\<:def >\n</:def>");
+            for (int i = 0; i < 17; i++)
+            {
+                reader.Read();  // so that position is at \n after fun declaration...
+            }
+            var scanner = new Scanner(reader);
+
+            // act
+            var isText = scanner.TryReadText();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+
+            // validate
+            Assert.True(isText);
+            Assert.Equal(TokenType.Text, firstToken.Type);
+            Assert.Equal("\n<:def >\n", firstToken.Value);
+            Assert.Equal(TokenType.TagClose, secondToken.Type);
+
+        }
+
+        [Fact]
+        public void StreamWithFunBodyWithEscapeCharsEscaped_ReadTokensAndText_TokensAreCorrect()
+        {
+            // prepare
+            var reader = new StringsReader("<:def function()>\n\\\\<:def \n");
+            for (int i = 0; i < 17; i++)
+            {
+                reader.Read();  // so that position is at \n after fun declaration...
+            }
+            var scanner = new Scanner(reader);
+
+            // act
+            scanner.TryReadText();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.Text, firstToken.Type);
+            Assert.Equal("\n\\", firstToken.Value);
+            Assert.Equal(TokenType.LessThan, secondToken.Type);
+            Assert.Equal(TokenType.Def, thirdToken.Type);
+        }
+
+        [Fact]
+        public void StreamWithIdInCurlyBrackets_ReadTokens_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("{identifier}</h>");
+            var scanner = new Scanner(reader);
+
+            // act
+            var isTextFirst = scanner.TryReadText();
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            var isText = scanner.TryReadText();
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.CurlyBracketOpen, firstToken.Type);
+            Assert.Equal(TokenType.Identifier, secondToken.Type);
+            Assert.Equal("identifier", secondToken.Value);
+            Assert.Equal(TokenType.CurlyBracketClose, thirdToken.Type);
+            Assert.False(isTextFirst);
+            Assert.False(isText);
+            Assert.Equal(TokenType.TagClose, forthToken.Type);
+
+        }
+
+        [Fact]
+        public void StreamWithEscapedCurlyBrackets_ReadTokens_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("\\{identifier}</h>");
+            var scanner = new Scanner(reader);
+
+            // act
+            var isTextFirst = scanner.TryReadText();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+
+            // validate
+            Assert.True(isTextFirst);
+            Assert.Equal(TokenType.Text, firstToken.Type);
+            Assert.Equal("{identifier}", firstToken.Value);
+            Assert.Equal(TokenType.TagClose, secondToken.Type);
+
+        }
+        [Fact]
+        public void StreamWithIdInCurlyBracketsWithSpaces_ReadTokens_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("{ identifier }</h>");
+            var scanner = new Scanner(reader);
+
+            // act
+            var isTextFirst = scanner.TryReadText();
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            var isText = scanner.TryReadText();
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.CurlyBracketOpen, firstToken.Type);
+            Assert.Equal(TokenType.Identifier, secondToken.Type);
+            Assert.Equal("identifier", secondToken.Value);
+            Assert.Equal(TokenType.CurlyBracketClose, thirdToken.Type);
+            Assert.False(isTextFirst);
+            Assert.False(isText);
+            Assert.Equal(TokenType.TagClose, forthToken.Type);
+
+        }
+
+        [Fact]
+        public void StreamWithInlineTag_ReadTokens_TokensAreCorrect()
+        {
+
+            // prepare
+            var reader = new StringsReader("<br/>");
+            var scanner = new Scanner(reader);
+
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+
+            // validate
+            Assert.Equal(TokenType.LessThan, firstToken.Type);
+            Assert.Equal(TokenType.Identifier, secondToken.Type);
+            Assert.Equal("br", secondToken.Value);
+            Assert.Equal(TokenType.TagCloseInline, thirdToken.Type);
+            Assert.Equal(TokenType.Eof, forthToken.Type);
+
+        }
+
+        [Fact]
+        public void StreamWithIfExp_ReadNextTokenTillEof_TokensAreCorrect()
+        {
+            // prepare
+            var reader = new StringsReader("<:if (a.is_potentially_hazardous_asteroid)>");
+            var scanner = new Scanner(reader);
+
+            // act
+            var array_size = 9;
+            Token[] array_of_tokens = new Token[array_size];
+            for (int i = 0; i < array_size; i++)
+            {
                 scanner.ReadNextToken();
-                var second_token = scanner.Token;
-
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, first_token.Type);
-                Assert.Equal(TokenType.Eof, second_token.Type);
+                array_of_tokens[i] = scanner.Token;
             }
+
+            // validate
+            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.If, array_of_tokens[1].Type);
+            Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
+            Assert.Equal("a", array_of_tokens[3].Value);
+            Assert.Equal(TokenType.Dot, array_of_tokens[4].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[5].Type);
+            Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[5].Value);
+            Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[6].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[7].Type);
+            Assert.Equal(TokenType.Eof, array_of_tokens[8].Type);
         }
 
         [Fact]
-        public void ReadsFunctionCloseToken()
+        public void StreamWithIfExpNegated_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            using (var stream = StreamGenerator.GenerateStreamFromString("</:def>"))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("<:if (!a.is_potentially_hazardous_asteroid)>");
+            var scanner = new Scanner(reader);
 
-                // act
+            // act
+            var array_size = 10;
+            Token[] array_of_tokens = new Token[array_size];
+            for (int i = 0; i < array_size; i++)
+            {
                 scanner.ReadNextToken();
-                var first_token = scanner.Token;
+                array_of_tokens[i] = scanner.Token;
+            }
+
+            // validate
+            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.If, array_of_tokens[1].Type);
+            Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
+            Assert.Equal(TokenType.ExclamationMark, array_of_tokens[3].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
+            Assert.Equal("a", array_of_tokens[4].Value);
+            Assert.Equal(TokenType.Dot, array_of_tokens[5].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[6].Type);
+            Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[6].Value);
+            Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[7].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[8].Type);
+            Assert.Equal(TokenType.Eof, array_of_tokens[9].Type);
+        }
+
+        [Fact]
+        public void StreamWithIfExpWithSpaces_ReadNextTokenTillEof_TokensAreCorrect()
+        {
+            // prepare
+            var reader = new StringsReader("<:if ( a.is_potentially_hazardous_asteroid ) >");
+            var scanner = new Scanner(reader);
+
+            // act
+            var array_size = 9;
+            Token[] array_of_tokens = new Token[array_size];
+            for (int i = 0; i < array_size; i++)
+            {
                 scanner.ReadNextToken();
-                var second_token = scanner.Token;
-
-                // validate
-                Assert.Equal(TokenType.FunctionClose, first_token.Type);
-                Assert.Equal(TokenType.Eof, second_token.Type);
+                array_of_tokens[i] = scanner.Token;
             }
+
+            // validate
+            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.If, array_of_tokens[1].Type);
+            Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
+            Assert.Equal("a", array_of_tokens[3].Value);
+            Assert.Equal(TokenType.Dot, array_of_tokens[4].Type);
+            Assert.Equal(TokenType.Identifier, array_of_tokens[5].Type);
+            Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[5].Value);
+            Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[6].Type);
+            Assert.Equal(TokenType.GreaterThan, array_of_tokens[7].Type);
+            Assert.Equal(TokenType.Eof, array_of_tokens[8].Type);
         }
 
         [Fact]
-        public void ReadFunctionWithOneArgument()
+        public void StreamWithEqualityComparison_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = @"<:def function(arg1)>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("a[5] == 10 ");
+            var scanner = new Scanner(reader);
 
-                // act
-                int size_array = 7;
-                Token[] array_of_tokens = new Token[size_array];
-                for (int i = 0; i < size_array; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var fifthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var sixthToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
-
-                Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
-                Assert.Equal("arg1", array_of_tokens[3].Value);
-
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[5].Type);
-
-                Assert.Equal(TokenType.Eof, array_of_tokens[6].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.Identifier, firstToken.Type);
+            Assert.Equal("a", firstToken.Value);
+            Assert.Equal(TokenType.SquareBracketOpen, secondToken.Type);
+            Assert.Equal(TokenType.Number, thirdToken.Type);
+            Assert.Equal("5", thirdToken.Value);
+            Assert.Equal(TokenType.SquareBracketClose, forthToken.Type);
+            Assert.Equal(TokenType.Equal, fifthToken.Type);
+            Assert.Equal(TokenType.Number, sixthToken.Type);
+            Assert.Equal("10", sixthToken.Value);
         }
 
         [Fact]
-        public void ReadsAllTokensInFunction()
+        public void StreamWithInequalityComparison_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = @"<:def function(arg1)>
-whatever inside
-</:def>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("a[5]!= 10 ");
+            var scanner = new Scanner(reader);
 
-                // act
-                var array_size = 10;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var fifthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var sixthToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
-                Assert.Equal("arg1", array_of_tokens[3].Value);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[6].Type);
-                Assert.Equal("whatever", array_of_tokens[6].Value);
-                Assert.Equal(TokenType.Text, array_of_tokens[7].Type);
-                Assert.Equal("inside\n", array_of_tokens[7].Value);
-                Assert.Equal(TokenType.FunctionClose, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[9].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.Identifier, firstToken.Type);
+            Assert.Equal("a", firstToken.Value);
+            Assert.Equal(TokenType.SquareBracketOpen, secondToken.Type);
+            Assert.Equal(TokenType.Number, thirdToken.Type);
+            Assert.Equal("5", thirdToken.Value);
+            Assert.Equal(TokenType.SquareBracketClose, forthToken.Type);
+            Assert.Equal(TokenType.NotEqual, fifthToken.Type);
+            Assert.Equal(TokenType.Number, sixthToken.Type);
+            Assert.Equal("10", sixthToken.Value);
         }
 
         [Fact]
-        public void ReadFunctionWithMultipleArguments()
+        public void StreamWithGreaterEqualComparison_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = @"<:def function(arg1, _arg2, _3)>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("a[5]>=10 ");
+            var scanner = new Scanner(reader);
 
-                // act
-                int size_array = 11;
-                Token[] array_of_tokens = new Token[size_array];
-                for (int i = 0; i < size_array; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var fifthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var sixthToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
-
-                Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
-                Assert.Equal("arg1", array_of_tokens[3].Value);
-
-                Assert.Equal(TokenType.Coma, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[5].Type);
-                Assert.Equal("_arg2", array_of_tokens[5].Value);
-
-                Assert.Equal(TokenType.Coma, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[7].Type);
-                Assert.Equal("_3", array_of_tokens[7].Value);
-
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[9].Type);
-
-                Assert.Equal(TokenType.Eof, array_of_tokens[10].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.Identifier, firstToken.Type);
+            Assert.Equal("a", firstToken.Value);
+            Assert.Equal(TokenType.SquareBracketOpen, secondToken.Type);
+            Assert.Equal(TokenType.Number, thirdToken.Type);
+            Assert.Equal("5", thirdToken.Value);
+            Assert.Equal(TokenType.SquareBracketClose, forthToken.Type);
+            Assert.Equal(TokenType.GreaterEqualThan, fifthToken.Type);
+            Assert.Equal(TokenType.Number, sixthToken.Type);
+            Assert.Equal("10", sixthToken.Value);
         }
 
         [Fact]
-        public void ReadsAllTokensInFunctionWithHtmlTagsInside()
+        public void StreamWithLessEqualComparison_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = @"<:def function()>
-<h>HTML inside</h>
-</:def>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("a[5]<= 10 ");
+            var scanner = new Scanner(reader);
 
-                // act
-                var array_size = 15;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var fifthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var sixthToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.LessThan, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[6].Type);
-                Assert.Equal("h", array_of_tokens[6].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[7].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[8].Type);
-                Assert.Equal("HTML", array_of_tokens[8].Value);
-                Assert.Equal(TokenType.Text, array_of_tokens[9].Type);
-                Assert.Equal("inside", array_of_tokens[9].Value);
-                Assert.Equal(TokenType.LessThan, array_of_tokens[10].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[11].Type);
-                Assert.Equal("/h", array_of_tokens[11].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[12].Type);
-                Assert.Equal(TokenType.FunctionClose, array_of_tokens[13].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[14].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.Identifier, firstToken.Type);
+            Assert.Equal("a", firstToken.Value);
+            Assert.Equal(TokenType.SquareBracketOpen, secondToken.Type);
+            Assert.Equal(TokenType.Number, thirdToken.Type);
+            Assert.Equal("5", thirdToken.Value);
+            Assert.Equal(TokenType.SquareBracketClose, forthToken.Type);
+            Assert.Equal(TokenType.LessEqualThan, fifthToken.Type);
+            Assert.Equal(TokenType.Number, sixthToken.Type);
+            Assert.Equal("10", sixthToken.Value);
         }
 
         [Fact]
-        public void EscapeCharacters()
+        public void StreamWithForExpr_ReadNextTokenSixTimes_TokensAreCorrect()
         {
-            var s = "<:def function()>\n\\<:def >\n</:def>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("<:for (asteroid in model.asteroids)");
+            var scanner = new Scanner(reader);
 
-                // act
-                var array_size = 10;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var fifthToken = scanner.Token;
+            scanner.ReadNextToken();
+            var sixthToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[5].Type);
-                Assert.Equal("<:def ", array_of_tokens[5].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.FunctionClose, array_of_tokens[7].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[8].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.LessThan, firstToken.Type);
+            Assert.Equal(TokenType.For, secondToken.Type);
+            Assert.Equal(TokenType.ParenthesisOpen, thirdToken.Type);
+            Assert.Equal(TokenType.Identifier, forthToken.Type);
+            Assert.Equal("asteroid", forthToken.Value);
+            Assert.Equal(TokenType.In, fifthToken.Type);
+            Assert.Equal(TokenType.Identifier, sixthToken.Type);
+            Assert.Equal("model", sixthToken.Value);
         }
 
         [Fact]
-        public void EscapeEscapeCharacters()
+        public void StreamWithElseExpr_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = "<:def function()>\n\\\\<:def \n</:def>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("<:else>");
+            var scanner = new Scanner(reader);
 
-                // act
-                var array_size = 10;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            scanner.ReadNextToken();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
+            scanner.ReadNextToken();
+            var forthToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[5].Type);
-                Assert.Equal("\\", array_of_tokens[5].Value);
-                Assert.Equal(TokenType.FunctionOpen, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.FunctionClose, array_of_tokens[7].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[8].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.LessThan, firstToken.Type);
+            Assert.Equal(TokenType.Else, secondToken.Type);
+            Assert.Equal(TokenType.GreaterThan, thirdToken.Type);
+            Assert.Equal(TokenType.Eof, forthToken.Type);
         }
 
         [Fact]
-        public void ReadsIdentifierInCurlyBrackets()
+        public void StreamWithString_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = "<h>{identifier}</h>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("\"string\"");
+            var scanner = new Scanner(reader);
 
-                // act
-                var array_size = 10;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            var isString = scanner.TryReadString();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[1].Type);
-                Assert.Equal("h", array_of_tokens[1].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.CurlyBracketOpen, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
-                Assert.Equal("identifier", array_of_tokens[4].Value);
-                Assert.Equal(TokenType.CurlyBracketClose, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.LessThan, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[7].Type);
-                Assert.Equal("/h", array_of_tokens[7].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[9].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.QuotationMark, firstToken.Type);
+            Assert.Equal(TokenType.Text, secondToken.Type);
+            Assert.Equal("string", secondToken.Value);
+            Assert.Equal(TokenType.QuotationMark, thirdToken.Type);
         }
 
         [Fact]
-        public void EscapesCurlyBrackets()
+        public void StreamWithStringWithEscapedQuoteMark_ReadNextTokenTillEof_TokensAreCorrect()
         {
-            var s = "<h>\\{identifier\\}</h>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
+            // prepare
+            var reader = new StringsReader("\"st\\\"ring\"");
+            var scanner = new Scanner(reader);
 
-                // act
-                var array_size = 8;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
+            // act
+            scanner.ReadNextToken();
+            var firstToken = scanner.Token;
+            var isString = scanner.TryReadString();
+            var secondToken = scanner.Token;
+            scanner.ReadNextToken();
+            var thirdToken = scanner.Token;
 
-                // validate
-                Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[1].Type);
-                Assert.Equal("h", array_of_tokens[1].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[3].Type);
-                Assert.Equal("{identifier}", array_of_tokens[3].Value);
-                Assert.Equal(TokenType.LessThan, array_of_tokens[4].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[5].Type);
-                Assert.Equal("/h", array_of_tokens[5].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[7].Type);
-            }
-        }
-
-        [Fact]
-        public void ReadsIdentifierInCurlyBracketsWithSpaces()
-        {
-            var s = "<h> { identifier } </h>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
-
-                // act
-                var array_size = 10;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
-
-                // validate
-                Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[1].Type);
-                Assert.Equal("h", array_of_tokens[1].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[2].Type);
-                Assert.Equal(TokenType.CurlyBracketOpen, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
-                Assert.Equal("identifier", array_of_tokens[4].Value);
-                Assert.Equal(TokenType.CurlyBracketClose, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.LessThan, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[7].Type);
-                Assert.Equal("/h", array_of_tokens[7].Value);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[9].Type);
-            }
-        }
-
-        [Fact]
-        public void ReadsIfExpression()
-        {
-            var s = "<:if (a.is_potentially_hazardous_asteroid)>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
-
-                // act
-                var array_size = 8;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
-
-                // validate
-                Assert.Equal(TokenType.IfExprOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
-                Assert.Equal("a", array_of_tokens[2].Value);
-                Assert.Equal(TokenType.Dot, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
-                Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[4].Value);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[7].Type);
-            }
-        }
-
-        [Fact]
-        public void ReadsIfExpressionWithEqualityComparison()
-        {
-            var s = "<:if (a[5] == 10)>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
-
-                // act
-                var array_size = 11;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
-
-                // validate
-                Assert.Equal(TokenType.IfExprOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
-                Assert.Equal("a", array_of_tokens[2].Value);
-                Assert.Equal(TokenType.SquareBracketOpen, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.Number, array_of_tokens[4].Type);
-                Assert.Equal("5", array_of_tokens[4].Value);
-                Assert.Equal(TokenType.SquareBracketClose, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.Equal, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Number, array_of_tokens[7].Type);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[9].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[10].Type);
-            }
-        }
-
-        [Fact]
-        public void ReadsIfExpressionWithInequalityComparison()
-        {
-            var s = "<:if (a[5] >= 10)>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
-
-                // act
-                var array_size = 11;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
-
-                // validate
-                Assert.Equal(TokenType.IfExprOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
-                Assert.Equal("a", array_of_tokens[2].Value);
-                Assert.Equal(TokenType.SquareBracketOpen, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.Number, array_of_tokens[4].Type);
-                Assert.Equal("5", array_of_tokens[4].Value);
-                Assert.Equal(TokenType.SquareBracketClose, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.GreaterEqualThan, array_of_tokens[6].Type);
-                Assert.Equal(TokenType.Number, array_of_tokens[7].Type);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[9].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[10].Type);
-            }
-        }
-
-
-        [Fact]
-        public void ReadsForExpressions()
-        {
-            var s = "<:for (asteroid in model.asteroids)>{row(asteroid, \"red\")}</:for>";
-            using (var stream = StreamGenerator.GenerateStreamFromString(s))
-            {
-                // prepare
-                var stream_reader = new StreamReader(stream);
-                var scanner = new Scanner(stream_reader);
-
-                // act
-                var array_size = 21;
-                Token[] array_of_tokens = new Token[array_size];
-                for (int i = 0; i < array_size; i++)
-                {
-                    scanner.ReadNextToken();
-                    array_of_tokens[i] = scanner.Token;
-                }
-
-                // validate
-                Assert.Equal(TokenType.ForExprOpen, array_of_tokens[0].Type);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[1].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
-                Assert.Equal("asteroid", array_of_tokens[2].Value);
-                Assert.Equal(TokenType.In, array_of_tokens[3].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
-                Assert.Equal("model", array_of_tokens[4].Value);
-                Assert.Equal(TokenType.Dot, array_of_tokens[5].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[6].Type);
-                Assert.Equal("asteroids", array_of_tokens[6].Value);
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[7].Type);
-                Assert.Equal(TokenType.GreaterThan, array_of_tokens[8].Type);
-                Assert.Equal(TokenType.CurlyBracketOpen, array_of_tokens[9].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[10].Type);
-                Assert.Equal("row", array_of_tokens[10].Value);
-                Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[11].Type);
-                Assert.Equal(TokenType.Identifier, array_of_tokens[12].Type);
-                Assert.Equal("asteroid", array_of_tokens[12].Value);
-                Assert.Equal(TokenType.Coma, array_of_tokens[13].Type);
-                Assert.Equal(TokenType.QuotationMark, array_of_tokens[14].Type);
-                Assert.Equal(TokenType.Text, array_of_tokens[15].Type);
-                Assert.Equal("red", array_of_tokens[15].Value);
-                Assert.Equal(TokenType.QuotationMark, array_of_tokens[16].Type);
-
-                Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[17].Type);
-                Assert.Equal(TokenType.CurlyBracketClose, array_of_tokens[18].Type);
-                Assert.Equal(TokenType.ForExprClose, array_of_tokens[19].Type);
-                Assert.Equal(TokenType.Eof, array_of_tokens[20].Type);
-            }
+            // validate
+            Assert.Equal(TokenType.QuotationMark, firstToken.Type);
+            Assert.Equal(TokenType.Text, secondToken.Type);
+            Assert.Equal("st\"ring", secondToken.Value);
+            Assert.Equal(TokenType.QuotationMark, thirdToken.Type);
         }
     }
 }
