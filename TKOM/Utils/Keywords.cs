@@ -20,10 +20,10 @@ namespace TKOM.Utils
                 };
         public static Dictionary<char, (TokenType?, Dictionary<char, TokenType>)> SpecialSignDict
                 = new Dictionary<char, (TokenType?, Dictionary<char, TokenType>)> {
-                    {'<', (TokenType.LessThan, 
+                    {'<', (TokenType.PointyBracketOpen, 
                             new Dictionary<char, TokenType> {{'=', TokenType.LessEqualThan},
                                                             {'/', TokenType.TagClose}})},
-                    {'>', (TokenType.GreaterThan, 
+                    {'>', (TokenType.PointyBracketClose, 
                             new Dictionary<char, TokenType> {{'=', TokenType.GreaterEqualThan}})},
                     {'=', (TokenType.AssignmentMark,
                             new Dictionary<char, TokenType> {{'=', TokenType.Equal}})},

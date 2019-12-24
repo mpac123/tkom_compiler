@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
+using TKOM.Tools;
 
 namespace TKOM
 {
@@ -6,7 +8,14 @@ namespace TKOM
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter("TKOM.Tools.Parser", LogLevel.Debug)
+                    .AddConsole();
+            });
+            ILogger logger = loggerFactory.CreateLogger<Parser>();
         }
+
     }
 }

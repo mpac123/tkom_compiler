@@ -10,8 +10,14 @@ namespace TKOM.Readers
 
         public int CurrentSign {get; private set;}
 
+        public int Line {get; private set;} 
+
+        public int Column {get; private set;} 
+
         public FileReader(string path)
         {
+            Line = 0;
+            Column = 0;
             _fstream = File.OpenRead(path);
             Read();
         }
@@ -39,6 +45,14 @@ namespace TKOM.Readers
         public void Read()
         {
             CurrentSign = _fstream.ReadByte();
+            if (CurrentSign == '\n')
+            {
+                Line += 1;
+            }
+            else
+            {
+                Column += 1;
+            }
         }
 
         public void Rewind(int numSigns)

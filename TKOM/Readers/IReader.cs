@@ -1,8 +1,10 @@
-namespace TKOM.Readers 
+namespace TKOM.Readers
 {
     public interface IReader
     {
-        int CurrentSign {get;}
+        int Line { get; }
+        int Column { get; }
+        int CurrentSign { get; }
         void Read();
         void Rewind(int numSigns);
     }

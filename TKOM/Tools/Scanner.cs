@@ -16,6 +16,7 @@ namespace TKOM.Tools
             _reader = reader;
         }
         public Token Token { private set; get; }
+
         public void ReadNextToken()
         {
             SkipWhitespaces();
@@ -39,6 +40,7 @@ namespace TKOM.Tools
 
         public bool TryReadText()
         {
+            SkipNewLines();
             var buffer = new StringBuilder();
             while (IsAllowedInText())
             {
@@ -76,6 +78,15 @@ namespace TKOM.Tools
         {
             while (_reader.CurrentSign == ' '
                 || _reader.CurrentSign == '\n'
+                || _reader.CurrentSign == '\r')
+            {
+                _reader.Read();
+            }
+        }
+
+        private void SkipNewLines()
+        {
+            while (_reader.CurrentSign == '\n'
                 || _reader.CurrentSign == '\r')
             {
                 _reader.Read();

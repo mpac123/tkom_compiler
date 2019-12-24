@@ -9,12 +9,18 @@ namespace TKOM.Readers
 
         public StringsReader(string s)
         {
+            Line = 0;
+            Column = 0;
             _string = s;
             _position = 0;
             Read();
         }
 
         public int CurrentSign { get; private set; }
+
+        public int Line { get; private set; }
+
+        public int Column { get; private set; }
 
         public void Read()
         {
@@ -26,6 +32,14 @@ namespace TKOM.Readers
             {
                 CurrentSign = _string[_position];
                 _position++;
+            }
+            if (CurrentSign == '\n')
+            {
+                Line += 1;
+            }
+            else
+            {
+                Column += 1;
             }
         }
 

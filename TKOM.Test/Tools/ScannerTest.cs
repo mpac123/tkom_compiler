@@ -4,7 +4,7 @@ using TKOM.Readers;
 using TKOM.Utils;
 using TKOM.Tools;
 
-namespace TKOM.Test.Parser
+namespace TKOM.Test.Tools
 {
     public class ScannerTest
     {
@@ -24,7 +24,7 @@ namespace TKOM.Test.Parser
         }
 
         [Fact]
-        public void StreamWithTagOpen_ReadsNextToken_TokenIsLessThan()
+        public void StreamWithTagOpen_ReadsNextToken_TokenIsPointyBracketOpen()
         {
             // prepare
             var reader = new StringsReader("<:def");
@@ -35,7 +35,7 @@ namespace TKOM.Test.Parser
             var first_token = scanner.Token;
 
             // validate
-            Assert.Equal(TokenType.LessThan, first_token.Type);
+            Assert.Equal(TokenType.PointyBracketOpen, first_token.Type);
         }
 
         [Fact]
@@ -54,7 +54,7 @@ namespace TKOM.Test.Parser
         }
 
         [Fact]
-        public void StreamWithDefTagOpen_ReadsNextTokenTwice_TokensAreIsLessThanAndDef()
+        public void StreamWithDefTagOpen_ReadsNextTokenTwice_TokensAreIsPointyBracketOpenAndDef()
         {
             // prepare
             var reader = new StringsReader("<:def");
@@ -69,13 +69,13 @@ namespace TKOM.Test.Parser
             var third_token = scanner.Token;
 
             // validate
-            Assert.Equal(TokenType.LessThan, first_token.Type);
+            Assert.Equal(TokenType.PointyBracketOpen, first_token.Type);
             Assert.Equal(TokenType.Def, second_token.Type);
             Assert.Equal(TokenType.Eof, third_token.Type);
         }
 
         [Fact]
-        public void StreamWithDefTagClose_ReadsNextTokenThreeTimes_TokensAreTagCloseAndDefAndGreaterThan()
+        public void StreamWithDefTagClose_ReadsNextTokenThreeTimes_TokensAreTagCloseAndDefAndPointyBracketClose()
         {
             // prepare
             var reader = new StringsReader("</:def>");
@@ -94,7 +94,7 @@ namespace TKOM.Test.Parser
             // validate
             Assert.Equal(TokenType.TagClose, first_token.Type);
             Assert.Equal(TokenType.Def, second_token.Type);
-            Assert.Equal(TokenType.GreaterThan, third_token.Type);
+            Assert.Equal(TokenType.PointyBracketClose, third_token.Type);
             Assert.Equal(TokenType.Eof, fourth_token.Type);
         }
 
@@ -116,7 +116,7 @@ namespace TKOM.Test.Parser
             }
 
             // validate
-            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.PointyBracketOpen, array_of_tokens[0].Type);
             Assert.Equal(TokenType.Def, array_of_tokens[1].Type);
             Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
             Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[3].Type);
@@ -125,7 +125,7 @@ namespace TKOM.Test.Parser
             Assert.Equal("arg1", array_of_tokens[4].Value);
 
             Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[5].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[6].Type);
 
             Assert.Equal(TokenType.Eof, array_of_tokens[7].Type);
         }
@@ -155,19 +155,19 @@ namespace TKOM.Test.Parser
             }
 
             // validate
-            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.PointyBracketOpen, array_of_tokens[0].Type);
             Assert.Equal(TokenType.Def, array_of_tokens[1].Type);
             Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
             Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[3].Type);
             Assert.Equal(TokenType.Identifier, array_of_tokens[4].Type);
             Assert.Equal("arg1", array_of_tokens[4].Value);
             Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[5].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[6].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[6].Type);
             Assert.Equal(TokenType.Text, array_of_tokens[7].Type);
-            Assert.Equal("\nwhatever inside\n", array_of_tokens[7].Value);
+            Assert.Equal("whatever inside\n", array_of_tokens[7].Value);
             Assert.Equal(TokenType.TagClose, array_of_tokens[8].Type);
             Assert.Equal(TokenType.Def, array_of_tokens[9].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[10].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[10].Type);
             Assert.Equal(TokenType.Eof, array_of_tokens[11].Type);
         }
 
@@ -189,7 +189,7 @@ namespace TKOM.Test.Parser
             }
 
             // validate
-            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.PointyBracketOpen, array_of_tokens[0].Type);
             Assert.Equal(TokenType.Def, array_of_tokens[1].Type);
             Assert.Equal(TokenType.Identifier, array_of_tokens[2].Type);
             Assert.Equal("function", array_of_tokens[2].Value);
@@ -207,7 +207,7 @@ namespace TKOM.Test.Parser
             Assert.Equal("_3", array_of_tokens[8].Value);
 
             Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[9].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[10].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[10].Type);
 
             Assert.Equal(TokenType.Eof, array_of_tokens[11].Type);
         }
@@ -217,7 +217,7 @@ namespace TKOM.Test.Parser
         {
 
             // prepare
-            var reader = new StringsReader("<:def function()>\n<h>HTML inside</h>\n</:def>");
+            var reader = new StringsReader("<:def function()>\na<h>HTML inside</h>\nb</:def>");
             for (int i = 0; i < 17; i++)
             {
                 reader.Read();  // so that position is at \n after fun declaration...
@@ -239,11 +239,11 @@ namespace TKOM.Test.Parser
             // validate
             Assert.True(isText);
             Assert.Equal(TokenType.Text, firstToken.Type);
-            Assert.Equal("\n", firstToken.Value);
-            Assert.Equal(TokenType.LessThan, secondToken.Type);
+            Assert.Equal("a", firstToken.Value);
+            Assert.Equal(TokenType.PointyBracketOpen, secondToken.Type);
             Assert.Equal(TokenType.Identifier, thirdToken.Type);
             Assert.Equal("h", thirdToken.Value);
-            Assert.Equal(TokenType.GreaterThan, forthToken.Type);
+            Assert.Equal(TokenType.PointyBracketClose, forthToken.Type);
             Assert.Equal(TokenType.Text, fifthToken.Type);
             Assert.Equal("HTML inside", fifthToken.Value);
 
@@ -270,7 +270,7 @@ namespace TKOM.Test.Parser
             // validate
             Assert.True(isText);
             Assert.Equal(TokenType.Text, firstToken.Type);
-            Assert.Equal("\n<:def >\n", firstToken.Value);
+            Assert.Equal("<:def >\n", firstToken.Value);
             Assert.Equal(TokenType.TagClose, secondToken.Type);
 
         }
@@ -296,8 +296,8 @@ namespace TKOM.Test.Parser
 
             // validate
             Assert.Equal(TokenType.Text, firstToken.Type);
-            Assert.Equal("\n\\", firstToken.Value);
-            Assert.Equal(TokenType.LessThan, secondToken.Type);
+            Assert.Equal("\\", firstToken.Value);
+            Assert.Equal(TokenType.PointyBracketOpen, secondToken.Type);
             Assert.Equal(TokenType.Def, thirdToken.Type);
         }
 
@@ -403,7 +403,7 @@ namespace TKOM.Test.Parser
             var forthToken = scanner.Token;
 
             // validate
-            Assert.Equal(TokenType.LessThan, firstToken.Type);
+            Assert.Equal(TokenType.PointyBracketOpen, firstToken.Type);
             Assert.Equal(TokenType.Identifier, secondToken.Type);
             Assert.Equal("br", secondToken.Value);
             Assert.Equal(TokenType.TagCloseInline, thirdToken.Type);
@@ -428,7 +428,7 @@ namespace TKOM.Test.Parser
             }
 
             // validate
-            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.PointyBracketOpen, array_of_tokens[0].Type);
             Assert.Equal(TokenType.If, array_of_tokens[1].Type);
             Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
             Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
@@ -437,7 +437,7 @@ namespace TKOM.Test.Parser
             Assert.Equal(TokenType.Identifier, array_of_tokens[5].Type);
             Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[5].Value);
             Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[6].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[7].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[7].Type);
             Assert.Equal(TokenType.Eof, array_of_tokens[8].Type);
         }
 
@@ -458,7 +458,7 @@ namespace TKOM.Test.Parser
             }
 
             // validate
-            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.PointyBracketOpen, array_of_tokens[0].Type);
             Assert.Equal(TokenType.If, array_of_tokens[1].Type);
             Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
             Assert.Equal(TokenType.ExclamationMark, array_of_tokens[3].Type);
@@ -468,7 +468,7 @@ namespace TKOM.Test.Parser
             Assert.Equal(TokenType.Identifier, array_of_tokens[6].Type);
             Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[6].Value);
             Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[7].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[8].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[8].Type);
             Assert.Equal(TokenType.Eof, array_of_tokens[9].Type);
         }
 
@@ -489,7 +489,7 @@ namespace TKOM.Test.Parser
             }
 
             // validate
-            Assert.Equal(TokenType.LessThan, array_of_tokens[0].Type);
+            Assert.Equal(TokenType.PointyBracketOpen, array_of_tokens[0].Type);
             Assert.Equal(TokenType.If, array_of_tokens[1].Type);
             Assert.Equal(TokenType.ParenthesisOpen, array_of_tokens[2].Type);
             Assert.Equal(TokenType.Identifier, array_of_tokens[3].Type);
@@ -498,7 +498,7 @@ namespace TKOM.Test.Parser
             Assert.Equal(TokenType.Identifier, array_of_tokens[5].Type);
             Assert.Equal("is_potentially_hazardous_asteroid", array_of_tokens[5].Value);
             Assert.Equal(TokenType.ParenthesisClose, array_of_tokens[6].Type);
-            Assert.Equal(TokenType.GreaterThan, array_of_tokens[7].Type);
+            Assert.Equal(TokenType.PointyBracketClose, array_of_tokens[7].Type);
             Assert.Equal(TokenType.Eof, array_of_tokens[8].Type);
         }
 
@@ -656,7 +656,7 @@ namespace TKOM.Test.Parser
             var sixthToken = scanner.Token;
 
             // validate
-            Assert.Equal(TokenType.LessThan, firstToken.Type);
+            Assert.Equal(TokenType.PointyBracketOpen, firstToken.Type);
             Assert.Equal(TokenType.For, secondToken.Type);
             Assert.Equal(TokenType.ParenthesisOpen, thirdToken.Type);
             Assert.Equal(TokenType.Identifier, forthToken.Type);
@@ -684,9 +684,9 @@ namespace TKOM.Test.Parser
             var forthToken = scanner.Token;
 
             // validate
-            Assert.Equal(TokenType.LessThan, firstToken.Type);
+            Assert.Equal(TokenType.PointyBracketOpen, firstToken.Type);
             Assert.Equal(TokenType.Else, secondToken.Type);
-            Assert.Equal(TokenType.GreaterThan, thirdToken.Type);
+            Assert.Equal(TokenType.PointyBracketClose, thirdToken.Type);
             Assert.Equal(TokenType.Eof, forthToken.Type);
         }
 
