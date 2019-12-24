@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using static TKOM.Utils.Token;
 
 namespace TKOM.AST
 {
@@ -9,5 +10,11 @@ namespace TKOM.AST
 
         public List<IInstruction> Instructions { set; get; }
         public List<IInstruction> InstructionsElse { set; get; }
+
+        public IfExpression()
+        {
+            Instructions = new List<IInstruction>();
+            InstructionsElse = new List<IInstruction>();
+        }
     }
 }

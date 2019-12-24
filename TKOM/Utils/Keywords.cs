@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using static TKOM.Utils.Token;
+using TKOM.AST;
 
 namespace TKOM.Utils
 {
@@ -20,10 +21,10 @@ namespace TKOM.Utils
                 };
         public static Dictionary<char, (TokenType?, Dictionary<char, TokenType>)> SpecialSignDict
                 = new Dictionary<char, (TokenType?, Dictionary<char, TokenType>)> {
-                    {'<', (TokenType.PointyBracketOpen, 
+                    {'<', (TokenType.PointyBracketOpen,
                             new Dictionary<char, TokenType> {{'=', TokenType.LessEqualThan},
                                                             {'/', TokenType.TagClose}})},
-                    {'>', (TokenType.PointyBracketClose, 
+                    {'>', (TokenType.PointyBracketClose,
                             new Dictionary<char, TokenType> {{'=', TokenType.GreaterEqualThan}})},
                     {'=', (TokenType.AssignmentMark,
                             new Dictionary<char, TokenType> {{'=', TokenType.Equal}})},
@@ -41,6 +42,17 @@ namespace TKOM.Utils
                     {'!', (TokenType.ExclamationMark,
                             new Dictionary<char, TokenType> {{'=', TokenType.NotEqual}})}
                 };
+
+        public static IDictionary<TokenType, ConditionType> ConditionTypeDict =
+        new Dictionary<TokenType, ConditionType>
+        {
+            {TokenType.NotEqual, ConditionType.NotEqual},
+            {TokenType.Equal, ConditionType.Equal},
+            {TokenType.GreaterEqualThan, ConditionType.GreaterEqualThan},
+            {TokenType.PointyBracketClose, ConditionType.GreaterThan},
+            {TokenType.LessEqualThan, ConditionType.LessEqualThan},
+            {TokenType.PointyBracketOpen, ConditionType.LessThan}
+        };
 
     }
 }

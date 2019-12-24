@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using TKOM.AST;
 using TKOM.Exceptions;
+using TKOM.Utils;
 using static TKOM.Utils.Token;
 
 namespace TKOM.Tools
@@ -36,18 +38,24 @@ namespace TKOM.Tools
             }
             var function = new Function();
             (function.Identifier, function.Arguments) = ParseDefOpeningTag();
+            function.Instructions = ParseInstructionsTillTagClose();
+            ParseDefClosingTag();
+            return function;
+        }
+
+        private List<IInstruction> ParseInstructionsTillTagClose()
+        {
+            var instructions = new List<IInstruction>();
             if (_scanner.TryReadText())
             {
-                function.Instructions.Add(new Literal { Content = _scanner.Token.Value });
+                instructions.Add(new Literal { Content = _scanner.Token.Value });
             }
             _scanner.ReadNextToken();
             while (_scanner.Token.Type != TokenType.TagClose)
             {
-                function.Instructions.Add(ParseStatement());
-                _scanner.ReadNextToken();
+                instructions.Add(ParseStatement());
             }
-            ParseDefClosingTag();
-            return function;
+            return instructions;
         }
 
         private (string functionName, List<string> argumentNames) ParseDefOpeningTag()
@@ -62,10 +70,7 @@ namespace TKOM.Tools
             };
             foreach (var expectedTokenType in expectedTokenTypes)
             {
-                if (_scanner.Token.Type != expectedTokenType)
-                {
-                    throw new ParsingException(expectedTokenType, _scanner.Token.Type);
-                }
+                ExpectTokenType(expectedTokenType);
                 if (expectedTokenType == TokenType.Identifier)
                 {
                     functionName.Append(_scanner.Token.Value);
@@ -74,10 +79,7 @@ namespace TKOM.Tools
             }
             while (_scanner.Token.Type != TokenType.ParenthesisClose)
             {
-                if (_scanner.Token.Type != TokenType.Identifier)
-                {
-                    throw new ParsingException(TokenType.Identifier, _scanner.Token.Type);
-                }
+                ExpectTokenType(TokenType.Identifier);
                 argumentNames.Add(_scanner.Token.Value);
                 _scanner.ReadNextToken();
                 if (_scanner.Token.Type == TokenType.Coma)
@@ -87,23 +89,14 @@ namespace TKOM.Tools
             }
 
             _scanner.ReadNextToken();
-            if (_scanner.Token.Type != TokenType.PointyBracketClose)
-            {
-                throw new ParsingException(TokenType.PointyBracketClose, _scanner.Token.Type);
-            }
+            ExpectTokenType(TokenType.PointyBracketClose);
 
             return (functionName.ToString(), argumentNames);
         }
 
         private IInstruction ParseStatement()
         {
-            if (_scanner.TryReadText())
-            {
-                return new Literal
-                {
-                    Content = _scanner.Token.Value
-                };
-            }
+
             if (_scanner.Token.Type == TokenType.PointyBracketOpen)
             {
                 _scanner.ReadNextToken();
@@ -125,13 +118,173 @@ namespace TKOM.Tools
                 return ParseValueOfOrFunctionCall();
 
             }
+            else
+            {
+                if (_scanner.TryReadText())
+                {
+                    var literal =  new Literal
+                    {
+                        Content = _scanner.Token.Value
+                    };
+                    _scanner.ReadNextToken();
+                    return literal;
+                }
+            }
             throw new ParsingException($"Parsing failed.");
         }
 
         private IfExpression ParseIfExpression()
         {
-            // TODO
-            return new IfExpression();
+            var result = new IfExpression();
+            _scanner.ReadNextToken();
+            ExpectTokenType(TokenType.ParenthesisOpen);
+            _scanner.ReadNextToken();
+            if (_scanner.Token.Type == TokenType.ExclamationMark)
+            {
+                result.Negated = true;
+                _scanner.ReadNextToken();
+            }
+            result.Condition = ParseCondition(result.Negated);
+            _scanner.ReadNextToken();
+            ExpectTokenType(TokenType.PointyBracketClose);
+            result.Instructions = ParseInstructionsTillTagClose();
+            // TODO: parse else expressions
+            var expectedTokens = new TokenType[] { TokenType.TagClose, TokenType.If, TokenType.PointyBracketClose };
+            foreach (var expected in expectedTokens)
+            {
+                ExpectTokenType(expected);
+                _scanner.ReadNextToken();
+            }
+            return result;
+        }
+
+        private ICondition ParseCondition(bool negated)
+        {
+            ConditionType conditionType;
+            ICondition result; ;
+            var lhs = ParseValueOf();
+            if (!negated && _scanner.Token.Type != TokenType.ParenthesisClose)
+            {
+                if (Keywords.ConditionTypeDict.TryGetValue(_scanner.Token.Type, out conditionType))
+                {
+                    _scanner.ReadNextToken();
+                    if (conditionType == ConditionType.Equal || conditionType == ConditionType.NotEqual)
+                    {
+                        result = ParseConditionWithAnyValue(lhs, conditionType);
+                    }
+                    else
+                    {
+                        result = ParseConditionWithNumericValue(lhs, conditionType);
+                    }
+                    ExpectTokenType(TokenType.ParenthesisClose);
+                    return result;
+                }
+
+            }
+            ExpectTokenType(TokenType.ParenthesisClose);
+            return new SimpleCondition
+            {
+                LeftHandSideVariable = lhs
+            };
+
+        }
+
+        private ValueOf ParseValueOf()
+        {
+            ExpectTokenType(TokenType.Identifier);
+            var result = new ValueOf
+            {
+                VariableName = _scanner.Token.Value
+            };
+            _scanner.ReadNextToken();
+            if (_scanner.Token.Type == TokenType.SquareBracketOpen)
+            {
+                _scanner.ReadNextToken();
+                ExpectTokenType(TokenType.Number);
+                result.Index = Int32.Parse(_scanner.Token.Value);
+                _scanner.ReadNextToken();
+                ExpectTokenType(TokenType.SquareBracketClose);
+                _scanner.ReadNextToken();
+            }
+            if (_scanner.Token.Type == TokenType.Dot)
+            {
+                _scanner.ReadNextToken();
+                ExpectTokenType(TokenType.Identifier);
+                result.NestedValue = ParseValueOf();
+            }
+            return result;
+        }
+
+        private ConditionWithNumericValue ParseConditionWithNumericValue(ValueOf lhs, ConditionType conditionType)
+        {
+            var result = new ConditionWithNumericValue
+            {
+                LeftHandSideVariable = lhs,
+                ConditionType = conditionType
+            };
+            ExpectTokenType(TokenType.Number);
+            var value = _scanner.Token.Value;
+            _scanner.ReadNextToken();
+            if (_scanner.Token.Type == TokenType.Dot)
+            {
+                var floatBuilder = new StringBuilder($"{value}.");
+                _scanner.ReadNextToken();
+                ExpectTokenType(TokenType.Number);
+                floatBuilder.Append(_scanner.Token.Value);
+                result.RealValue = float.Parse(floatBuilder.ToString());
+                _scanner.ReadNextToken();
+            }
+            else
+            {
+                result.Integer = true;
+                result.IntValue = int.Parse(value);
+            }
+            return result;
+        }
+
+        private ICondition ParseConditionWithAnyValue(ValueOf lhs, ConditionType conditionType)
+        {
+            if (_scanner.Token.Type == TokenType.Number)
+            {
+                return ParseConditionWithNumericValue(lhs, conditionType);
+            }
+            if (_scanner.Token.Type == TokenType.QuotationMark)
+            {
+                return ParseConditionWithString(lhs, conditionType);
+            }
+            return ParseConditionWithVariable(lhs, conditionType);
+        }
+
+        private ConditionWithString ParseConditionWithString(ValueOf lhs, ConditionType conditionType)
+        {
+            var result = new ConditionWithString
+            {
+                LeftHandSideVariable = lhs,
+                ConditionType = conditionType
+            };
+            if (!_scanner.TryReadString())
+            {
+                result.RightHandSideValue = "";
+            }
+            else
+            {
+                result.RightHandSideValue = _scanner.Token.Value;
+            }
+            _scanner.ReadNextToken();
+            ExpectTokenType(TokenType.QuotationMark);
+            _scanner.ReadNextToken();
+            return result;
+        }
+
+        private ConditionWithVariable ParseConditionWithVariable(ValueOf lhs, ConditionType conditionType)
+        {
+            var result = new ConditionWithVariable
+            {
+                LeftHandSideVariable = lhs,
+                ConditionType = conditionType,
+                RightHandSideVariable = ParseValueOf()
+            };
+            return result;
         }
 
         private ForExpression ParseForExpression()
@@ -161,11 +314,16 @@ namespace TKOM.Tools
             };
             foreach (var expectedTokenType in expectedTokenTypes)
             {
-                if (_scanner.Token.Type != expectedTokenType)
-                {
-                    throw new ParsingException(expectedTokenType, _scanner.Token.Type);
-                }
+                ExpectTokenType(expectedTokenType);
                 _scanner.ReadNextToken();
+            }
+        }
+
+        private void ExpectTokenType(TokenType expected)
+        {
+            if (_scanner.Token.Type != expected)
+            {
+                throw new ParsingException(expected, _scanner.Token.Type);
             }
         }
     }

@@ -1,19 +1,26 @@
+using System.Collections.Generic;
+using TKOM.Utils;
+using static TKOM.Utils.Token;
+
 namespace TKOM.AST
 {
     public interface ICondition
     {
-        
-        string LeftHandSideVariable {set; get;}
-        ConditionType? ConditionType {set; get;}
+
+        ValueOf LeftHandSideVariable { set; get; }
+        ConditionType? ConditionType { set; get; }
+
+
     }
 
     public enum ConditionType
-        {
-            Equal,
-            NotEqual,
-            PointyBracketOpen,
-            LessEqualThan,
-            PointyBracketClose,
-            GreaterEqualThan
-        }
+    {
+        Equal,
+        NotEqual,
+        LessThan,
+        LessEqualThan,
+        GreaterThan,
+        GreaterEqualThan
+    }
+
 }
