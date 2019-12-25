@@ -8,8 +8,6 @@ namespace TKOM.AST
     {
 
         ValueOf LeftHandSideVariable { set; get; }
-        ConditionType? ConditionType { set; get; }
-
 
     }
 

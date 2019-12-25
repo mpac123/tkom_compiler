@@ -183,7 +183,8 @@ namespace TKOM.Tools
             if (buffer.Length > 0)
             {
                 if (_reader.CurrentSign == '.' || _reader.CurrentSign == ' '
-                    || _reader.CurrentSign == ')' || _reader.CurrentSign == ']')
+                    || _reader.CurrentSign == ')' || _reader.CurrentSign == ']'
+                    || _reader.CurrentSign == ',')
                 {
                     Token = new Token(TokenType.Number, buffer.ToString());
                     return true;
@@ -215,7 +216,7 @@ namespace TKOM.Tools
                     || _reader.CurrentSign == '(' || _reader.CurrentSign == ','
                     || _reader.CurrentSign == '}' || _reader.CurrentSign == '\n'
                     || _reader.CurrentSign == '\r' || _reader.CurrentSign == '>'
-                    || _reader.CurrentSign == '/')
+                    || _reader.CurrentSign == '/' || _reader.CurrentSign == '=')
                 {
                     Token = new Token(TokenType.Identifier, buffer.ToString());
                     return true;

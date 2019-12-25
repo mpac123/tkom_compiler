@@ -1,9 +1,9 @@
 namespace TKOM.AST
 {
-    public class ConditionWithVariable : ICondition
+    public class ConditionWithValue : ICondition
     {
         public ValueOf LeftHandSideVariable { get; set; }
         public ConditionType? ConditionType { get; set; }
-        public ValueOf RightHandSideVariable {set; get;}
+        public Value RightHandSideVariable {set; get;}
     }
 }

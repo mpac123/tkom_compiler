@@ -1,6 +1,6 @@
 namespace TKOM.AST
 {
-    public class Literal : IInstruction
+    public class Literal : Value
     {
         public string Content {set; get;}
     }
