@@ -171,7 +171,7 @@ namespace TKOM.Tools
                     }
                     else
                     {
-                        result = ParseConditionWithNumericValue(lhs, conditionType);
+                        result = ParseConditionWithVariableOrNumericValue(lhs, conditionType);
                     }
                     ExpectTokenType(TokenType.ParenthesisClose);
                     return result;
@@ -212,7 +212,7 @@ namespace TKOM.Tools
             return result;
         }
 
-        private ConditionWithValue ParseConditionWithNumericValue(ValueOf lhs, ConditionType conditionType)
+        private ConditionWithValue ParseConditionWithVariableOrNumericValue(ValueOf lhs, ConditionType conditionType)
         {
             var result = new ConditionWithValue
             {
@@ -220,7 +220,7 @@ namespace TKOM.Tools
                 ConditionType = conditionType,
             };
 
-            result.RightHandSideVariable = ParseNumericValue();
+            result.RightHandSideVariable = ParseVariableOrNumericValue();
             return result;
         }
 
@@ -258,6 +258,22 @@ namespace TKOM.Tools
             return result;
         }
 
+
+        private Value ParseVariableOrNumericValue()
+        {
+            if (_scanner.Token.Type == TokenType.Number)
+            {
+                return ParseNumericValue();
+            }
+            else if (_scanner.Token.Type == TokenType.Identifier)
+            {
+                return ParseValueOf();
+            }
+
+            throw new ParsingException($"Expected argument (numeric value, variable name), {_scanner.Token.Type.ToString()} was found instead.");
+
+        }
+
         private Value ParseValue()
         {
             if (_scanner.Token.Type == TokenType.QuotationMark)
@@ -277,18 +293,6 @@ namespace TKOM.Tools
 
         }
 
-        private ConditionWithValue ParseConditionWithString(ValueOf lhs, ConditionType conditionType)
-        {
-            var result = new ConditionWithValue
-            {
-                LeftHandSideVariable = lhs,
-                ConditionType = conditionType
-            };
-
-            result.RightHandSideVariable = ParseLiteral();
-            return result;
-        }
-
         private Literal ParseLiteral()
         {
             var stringValue = new Literal();
@@ -304,17 +308,6 @@ namespace TKOM.Tools
             ExpectTokenType(TokenType.QuotationMark);
             _scanner.ReadNextToken();
             return stringValue;
-        }
-
-        private ConditionWithValue ParseConditionWithVariable(ValueOf lhs, ConditionType conditionType)
-        {
-            var result = new ConditionWithValue
-            {
-                LeftHandSideVariable = lhs,
-                ConditionType = conditionType,
-                RightHandSideVariable = ParseValueOf()
-            };
-            return result;
         }
 
         private ElseExpression ParseElseExpression()
