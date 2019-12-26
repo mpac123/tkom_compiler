@@ -1,4 +1,4 @@
-namespace TKOM.AST
+namespace TKOM.Structures.AST
 {
     public class NumericValue : Value
     {

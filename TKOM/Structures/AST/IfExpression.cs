@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using static TKOM.Utils.Token;
 
-namespace TKOM.AST
+namespace TKOM.Structures.AST
 {
     public class IfExpression : IInstruction
     {

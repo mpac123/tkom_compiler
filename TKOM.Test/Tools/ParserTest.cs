@@ -4,7 +4,7 @@ using Xunit;
 using Moq;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using TKOM.AST;
+using TKOM.Structures.AST;
 
 namespace TKOM.Test.Tools
 {

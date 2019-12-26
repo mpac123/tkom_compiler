@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using TKOM.Utils;
 using static TKOM.Utils.Token;
 
-namespace TKOM.AST
+namespace TKOM.Structures.AST
 {
     public interface ICondition
     {

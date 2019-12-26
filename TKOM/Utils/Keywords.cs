@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using static TKOM.Utils.Token;
-using TKOM.AST;
+using TKOM.Structures.AST;
 
 namespace TKOM.Utils
 {

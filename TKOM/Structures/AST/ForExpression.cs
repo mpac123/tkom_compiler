@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TKOM.AST
+namespace TKOM.Structures.AST
 {
     public class ForExpression : IInstruction
     {

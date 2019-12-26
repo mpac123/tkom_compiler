@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using TKOM.AST;
+using TKOM.Structures.AST;
 using TKOM.Exceptions;
 using TKOM.Utils;
 using static TKOM.Utils.Token;
@@ -17,9 +17,9 @@ namespace TKOM.Tools
         {
             _scanner = scanner;
         }
-        public AST.Program Parse()
+        public Structures.AST.Program Parse()
         {
-            var syntaxTree = new AST.Program();
+            var syntaxTree = new Structures.AST.Program();
             _scanner.ReadNextToken();
             var function = ParseFunction();
             while (function != null)
