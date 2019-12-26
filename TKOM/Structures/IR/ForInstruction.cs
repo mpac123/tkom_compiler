@@ -33,7 +33,7 @@ namespace TKOM.Structures.IR
                 Block.Initialize(new List<AssignedValue> {
                         new AssignedValue(JsonConvert.SerializeObject(element.ToObject<string>()))
                 });
-                Block.Execute(streamWriter, functions, nestedLevel + 1, true);
+                Block.Execute(streamWriter, functions, nestedLevel, true);
             }
         }
 

@@ -17,8 +17,6 @@
 </:def>
 
 <:def main(model)>
-    <!DOCTYPE html> 
-    <meta charset="utf-8"> 
     <header>
         <h1>Asteroids - close approaches to Earth</h1>
         <h2>{model.date}</h2>
