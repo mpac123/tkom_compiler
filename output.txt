@@ -1,0 +1,342 @@
+    <header>
+            
+    <h1>
+      Asteroids - close approaches to Earth
+</h1>
+    <h2>
+      2019-01-01
+</h2>
+</header><body>
+            
+    <div>
+                  
+      <table>
+                        
+        
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2019 AN)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                8.369
+</td>
+              <td>
+                40.230
+                - 
+                89.958
+</td>
+              <td>
+                49.688
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2007 YS56)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                6.461
+</td>
+              <td>
+                19.256
+                - 
+                43.057
+</td>
+              <td>
+                46.773
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2007 YQ56)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                <b>
+                  15.429
+</b>
+</td>
+              <td>
+                278.327
+                - 
+                622.358
+</td>
+              <td>
+                29.750
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2018 YV2)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                11.719
+</td>
+              <td>
+                38.420
+                - 
+                85.909
+</td>
+              <td>
+                26.577
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2017 EV2)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                13.642
+</td>
+              <td>
+                183.889
+                - 
+                411.188
+</td>
+              <td>
+                182.894
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2019 AO2)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                8.178
+</td>
+              <td>
+                38.420
+                - 
+                85.909
+</td>
+              <td>
+                78.878
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2018 RL4)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                12.065
+</td>
+              <td>
+                69.913
+                - 
+                156.329
+</td>
+              <td>
+                148.772
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                (2018 XB4)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                5.402
+</td>
+              <td>
+                42.126
+                - 
+                94.198
+</td>
+              <td>
+                41.530
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                527715 (2007 YQ56)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                <b>
+                  15.429
+</b>
+</td>
+              <td>
+                278.327
+                - 
+                622.358
+</td>
+              <td>
+                29.750
+</td>
+</tr>
+        
+                              
+          
+                                  
+          
+          
+                
+            <tr>
+                      
+              <td style="color:{color}">
+                539856 (2017 EV2)
+</td>
+              <td>
+                <a href="{asteroid.nasa_jpl_url}">
+                  Url
+</a>
+</td>
+              <td>
+                            
+                
+                                
+                13.642
+</td>
+              <td>
+                183.889
+                - 
+                411.188
+</td>
+              <td>
+                182.894
+</td>
+</tr>
+</table>
+</div>
+</body>

@@ -30,8 +30,12 @@ namespace TKOM.Structures.IR
 
             foreach (var element in collection)
             {
+                // Block.Initialize(new List<AssignedValue> {
+                //         new AssignedValue(JsonConvert.SerializeObject(element.ToObject<string>()))
+                // });
+
                 Block.Initialize(new List<AssignedValue> {
-                        new AssignedValue(JsonConvert.SerializeObject(element.ToObject<string>()))
+                        new AssignedValue(element.ToString())
                 });
                 Block.Execute(streamWriter, functions, nestedLevel, true);
             }

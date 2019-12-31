@@ -4,7 +4,6 @@ using Moq;
 using TKOM.Exceptions;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
-using TKOM.Structures.IT;
 using Xunit;
 
 namespace TKOM.Test.Structures.IR

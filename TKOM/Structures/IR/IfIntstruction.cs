@@ -6,7 +6,7 @@ using TKOM.Exceptions;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
 
-namespace TKOM.Structures.IT
+namespace TKOM.Structures.IR
 {
     public class IfInstruction : Instruction
     {

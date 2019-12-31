@@ -6,8 +6,9 @@ namespace TKOM.Structures.IR
 {
     public class HtmlInlineTagInstruction : Instruction
     {
-        public HtmlInlineTagInstruction(Scope scope) : base(scope)
+        public HtmlInlineTagInstruction(Scope scope, HtmlInlineTag htmlInlineTag) : base(scope)
         {
+            HtmlInlineTag = htmlInlineTag;
         }
 
         public HtmlInlineTag HtmlInlineTag { private set; get; }

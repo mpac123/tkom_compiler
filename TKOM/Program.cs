@@ -27,9 +27,9 @@ namespace TKOM
         }
         static void Main(string[] args)
         {
-            string model;
+            string model = "";
             string templatePath = "";
-            string outputPath;
+            string outputPath = "";
             CommandLine.Parser.Default.ParseArguments<Options>(args)
                 .WithParsed<Options>(opts =>
                 {
@@ -40,13 +40,35 @@ namespace TKOM
                             model = file.ReadToEnd();
                         }
                     }
+                    else
+                    {
+                        throw new Exception($"File with model could not be read.");
+                    }
                     if (File.Exists(opts.TemplatePath))
                     {
                         templatePath = opts.TemplatePath;
                     }
+                    else
+                    {
+                        throw new Exception($"File with template could not be read.");
+                    }
                     outputPath = opts.OutputPath;
+
+                    Execute(model, templatePath, outputPath);
                 });
 
+
+
+
+
+
+            // string json = @"[1, 2, 5]";
+            // var deserialized = JToken.Parse(json);
+            // Console.WriteLine(deserialized.Count());
+        }
+
+        private static void Execute(string model, string templatePath, string outputPath)
+        {
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
@@ -60,12 +82,11 @@ namespace TKOM
             var parser = new Tools.Parser(scanner, logger);
 
             var tree = parser.Parse();
+            var sem_checker = new SemanticsChecker(tree);
+            var functionsDict = sem_checker.CheckAST();
 
-
-
-            // string json = @"[1, 2, 5]";
-            // var deserialized = JToken.Parse(json);
-            // Console.WriteLine(deserialized.Count());
+            var executor = new Executor(functionsDict);
+            executor.Execute(model, outputPath);
         }
 
     }
