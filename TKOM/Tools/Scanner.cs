@@ -40,8 +40,8 @@ namespace TKOM.Tools
 
         public bool TryReadText()
         {
-            SkipWhitespaces();
             var buffer = new StringBuilder();
+            buffer.Append(ReadWhitespacesUnlessNewLine());
             while (IsAllowedInText())
             {
                 EscapeCharacterInTextIfNeeded();
@@ -91,6 +91,23 @@ namespace TKOM.Tools
             {
                 _reader.Read();
             }
+        }
+
+        private string ReadWhitespacesUnlessNewLine()
+        {
+            var builder = new StringBuilder();
+            while (_reader.CurrentSign == ' ')
+            {
+                builder.Append(' ');
+                _reader.Read();
+            }
+            if (_reader.CurrentSign == '\n' ||
+                _reader.CurrentSign == '\r')
+            {
+                SkipWhitespaces();
+                return "";
+            }
+            return builder.ToString();
         }
 
         private bool TryReadKeyword()
@@ -263,7 +280,7 @@ namespace TKOM.Tools
             {
                 _reader.Read();
                 if (!(_reader.CurrentSign == '"'
-                 || _reader.CurrentSign == '\\' 
+                 || _reader.CurrentSign == '\\'
                  || _reader.CurrentSign == '{'))
                 {
                     _reader.Rewind(1);

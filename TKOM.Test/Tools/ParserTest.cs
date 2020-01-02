@@ -1050,5 +1050,69 @@ namespace TKOM.Test.Tools
             Assert.Equal(typeof(ValueOf), htmlTag.Attributes.First().attributeValue.StringComponents.Skip(1).First().GetType());
             Assert.Equal("color", ((ValueOf)htmlTag.Attributes.First().attributeValue.StringComponents.Skip(1).First()).VariableName);
         }
+
+        [Fact]
+        public void TextWithNestedValue_Parse_WhitespacesPersisted()
+        {
+            // prepare
+            var reader = new StringsReader("<:def function(color)>" +
+                                                "<h1 style=\"color={color}\">Title {color} - {color}</h1>" +
+                                            "</:def>\n\n");
+            var scanner = new Scanner(reader);
+            var logger = new Mock<ILogger<Parser>>();
+            var parser = new Parser(scanner, logger.Object);
+
+            // act 
+            var tree = parser.Parse();
+
+            // validate
+            var instructions = ((HtmlTag)tree.Functions.First().Instructions.First()).Instructions;
+            Assert.Equal(4, instructions.Count());
+            Assert.Equal("Title ", ((Literal)instructions.First()).Content);
+            Assert.Equal(" - ", ((Literal)instructions.Skip(2).First()).Content);
+        }
+
+        [Fact]
+        public void TextWithNestedFunction_Parse_WhitespacesPersisted()
+        {
+            // prepare
+            var reader = new StringsReader("<:def function(color)>" +
+                                                "<h1 style=\"color={color}\">Title {color} - {function(arg)}</h1>" +
+                                            "</:def>\n\n");
+            var scanner = new Scanner(reader);
+            var logger = new Mock<ILogger<Parser>>();
+            var parser = new Parser(scanner, logger.Object);
+
+            // act 
+            var tree = parser.Parse();
+
+            // validate
+            var instructions = ((HtmlTag)tree.Functions.First().Instructions.First()).Instructions;
+            Assert.Equal(4, instructions.Count());
+            Assert.Equal("Title ", ((Literal)instructions.First()).Content);
+            Assert.Equal(" - ", ((Literal)instructions.Skip(2).First()).Content);
+            Assert.Equal(typeof(FunctionCall), instructions.Skip(3).First().GetType());
+        }
+
+        [Fact]
+        public void TextWithNestedTextAfterTag_Parse_WhitespacesPersisted()
+        {
+            // prepare
+            var reader = new StringsReader("<:def function(color)>" +
+                                                "<h1 style=\"color={color}\">Title</h1>random text" +
+                                            "</:def>\n\n");
+            var scanner = new Scanner(reader);
+            var logger = new Mock<ILogger<Parser>>();
+            var parser = new Parser(scanner, logger.Object);
+
+            // act 
+            var tree = parser.Parse();
+
+            // validate
+            var instructions = tree.Functions.First().Instructions;
+            Assert.Equal(2, instructions.Count());
+            Assert.Equal(typeof(Literal), instructions.Skip(1).First().GetType());
+            Assert.Equal("random text", ((Literal)instructions.Skip(1).First()).Content);
+        }
     }
 }

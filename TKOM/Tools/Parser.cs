@@ -120,6 +120,15 @@ namespace TKOM.Tools
                 return ParseValueOfOrFunctionCall();
 
             }
+            else if (_scanner.Token.Type == TokenType.Text)
+            {
+                var literal = new Literal
+                {
+                    Content = _scanner.Token.Value
+                };
+                _scanner.ReadNextToken();
+                return literal;
+            }
             else
             {
                 if (_scanner.TryReadText())
@@ -362,7 +371,10 @@ namespace TKOM.Tools
             }
             if (_scanner.Token.Type == TokenType.TagCloseInline)
             {
-                _scanner.ReadNextToken();
+                if (!_scanner.TryReadText())
+                {
+                    _scanner.ReadNextToken();
+                }
                 return new HtmlInlineTag
                 {
                     TagName = tagName,
@@ -413,7 +425,10 @@ namespace TKOM.Tools
             }
             _scanner.ReadNextToken();
             ExpectTokenType(TokenType.PointyBracketClose);
-            _scanner.ReadNextToken();
+            if (!_scanner.TryReadText())
+            {
+                _scanner.ReadNextToken();
+            }
             return result;
         }
 
@@ -435,7 +450,10 @@ namespace TKOM.Tools
                 }
             }
             ExpectTokenType(TokenType.CurlyBracketClose);
-            _scanner.ReadNextToken();
+            if (!_scanner.TryReadText())
+            {
+                _scanner.ReadNextToken();
+            }
             return valueOf;
         }
 

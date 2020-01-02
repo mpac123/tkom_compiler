@@ -1,0 +1,104 @@
+{
+  "date": "2019-01-03",
+  "asteroids": [
+    {
+      "name": "(2019 AD5)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3837674",
+      "absolute_magnitude_h": 22.87,
+      "estimated_diameter_min_meters": "70.885",
+      "estimated_diameter_max_meters": "158.504",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 01:38",
+      "relative_velocity_km_s": "14.762",
+      "miss_distance_lunar": "19.535"
+    },
+    {
+      "name": "(2018 YZ)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3836970",
+      "absolute_magnitude_h": 21.7,
+      "estimated_diameter_min_meters": "121.494",
+      "estimated_diameter_max_meters": "271.669",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 07:35",
+      "relative_velocity_km_s": "15.005",
+      "miss_distance_lunar": "114.725"
+    },
+    {
+      "name": "(2009 XQ1)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3483204",
+      "absolute_magnitude_h": 22.3,
+      "estimated_diameter_min_meters": "92.163",
+      "estimated_diameter_max_meters": "206.082",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 20:09",
+      "relative_velocity_km_s": "11.648",
+      "miss_distance_lunar": "73.825"
+    },
+    {
+      "name": "(2016 VS)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3763271",
+      "absolute_magnitude_h": 27.4,
+      "estimated_diameter_min_meters": "8.801",
+      "estimated_diameter_max_meters": "19.681",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 07:32",
+      "relative_velocity_km_s": "8.402",
+      "miss_distance_lunar": "98.213"
+    },
+    {
+      "name": "(2018 RP1)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3827307",
+      "absolute_magnitude_h": 24.3,
+      "estimated_diameter_min_meters": "36.691",
+      "estimated_diameter_max_meters": "82.043",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 06:32",
+      "relative_velocity_km_s": "3.772",
+      "miss_distance_lunar": "129.658"
+    },
+    {
+      "name": "357022 (1999 YG3)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=2357022",
+      "absolute_magnitude_h": 19.0,
+      "estimated_diameter_min_meters": "421.265",
+      "estimated_diameter_max_meters": "941.976",
+      "is_potentially_hazardous_asteroid": true,
+      "close_approach_date": "2019-Jan-03 16:17",
+      "relative_velocity_km_s": "25.902",
+      "miss_distance_lunar": "126.506"
+    },
+    {
+      "name": "(2019 AY3)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3837644",
+      "absolute_magnitude_h": 23.9,
+      "estimated_diameter_min_meters": "44.112",
+      "estimated_diameter_max_meters": "98.637",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 23:46",
+      "relative_velocity_km_s": "19.411",
+      "miss_distance_lunar": "13.115"
+    },
+    {
+      "name": "(2019 SJ)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3843878",
+      "absolute_magnitude_h": 27.517,
+      "estimated_diameter_min_meters": "8.340",
+      "estimated_diameter_max_meters": "18.648",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 03:47",
+      "relative_velocity_km_s": "7.086",
+      "miss_distance_lunar": "144.908"
+    },
+    {
+      "name": "(2019 YB4)",
+      "nasa_jpl_url": "http://ssd.jpl.nasa.gov/sbdb.cgi?sstr=3959223",
+      "absolute_magnitude_h": 26.73,
+      "estimated_diameter_min_meters": "11.983",
+      "estimated_diameter_max_meters": "26.794",
+      "is_potentially_hazardous_asteroid": false,
+      "close_approach_date": "2019-Jan-03 15:54",
+      "relative_velocity_km_s": "6.587",
+      "miss_distance_lunar": "9.580"
+    }
+  ]
+}

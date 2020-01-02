@@ -22,7 +22,7 @@ namespace TKOM.Structures.IR
             {
                 streamWriter.Write($" {attribute.attributeName}=\"{attribute.attributeValue}\"");
             }
-            streamWriter.Write($">");
+            streamWriter.Write($"/>");
         }
 
     }

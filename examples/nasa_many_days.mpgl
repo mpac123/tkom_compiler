@@ -1,0 +1,70 @@
+<:def row(asteroid, color)>
+    <tr>
+        <td style="color:{color}">{asteroid.name}</td>
+        <td><a href="{asteroid.nasa_jpl_url}">Url</a></td>
+        <td>
+            {show_relative_velocity(asteroid.relative_velocity_km_s, 12.5)}
+        </td>
+        <td>{asteroid.estimated_diameter_min_meters} - {asteroid.estimated_diameter_max_meters}</td>
+        <td>
+            {asteroid.miss_distance_lunar}
+            <:if (asteroid.miss_distance_lunar < 10)>
+                <b>!!!</b>
+            </:if>
+        </td>
+    </tr>
+</:def>
+
+<:def show_relative_velocity(velocity, limit)>
+    <:if (velocity > limit)>
+        <b>{velocity}</b>
+    </:if>
+    <:else>
+        {velocity}
+    </:else>
+</:def>
+
+<:def header()>
+    <tr>
+        <th>Name</th>
+        <th>Webpage</th>
+        <th>Relative velocity [km/s]</th>
+        <th>Estimated diameter [m]</th>
+        <th>Miss distance [lunar]</th>
+    </tr>
+</:def>
+
+<:def table(date, asteroids)>
+    <h3>{date}</h3>
+    <table style="width: 100%; text-align: left">
+        {header()}
+        <:for (asteroid in asteroids)>
+            <:if (asteroid.is_potentially_hazardous_asteroid)>
+                {row(asteroid, "red")}
+            </:if>
+            <:else>
+                {row(asteroid, "black")}
+            </:else>
+        </:for>
+    </table>
+</:def>
+
+<:def main(model)>
+    <header>
+        <h1>Asteroids - close approaches to Earth</h1>
+        <h2>Date range: {model.date_range_from} - {model.date_range_to}</h2>
+    </header>
+    <body>
+        <div style="text-align: center">
+            <:for (day in model.asteroids_by_day)>
+                {table(day.date, day.asteroids)}
+            </:for>
+        </div>
+    </body>
+    <footer style="text-align: center">
+        \<hr>
+        <span>
+            \{Data source: <a href="https://data.nasa.gov/Space-Science/Asteroids-NeoWs-API/73uw-d9i8">NASA NeoWs API</a>}
+        </span>
+    </footer>
+</:def>

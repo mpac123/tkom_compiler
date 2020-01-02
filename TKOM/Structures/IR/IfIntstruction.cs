@@ -30,11 +30,22 @@ namespace TKOM.Structures.IR
         {
             if (IsComparisonTrue())
             {
-                PerformBlock(IfBlock, streamWriter, functions, nestedLevel, newLine);
+                //PerformBlock(IfBlock, streamWriter, functions, nestedLevel, newLine);
+                foreach (var instrucion in IfBlock)
+                {
+                    instrucion.Execute(streamWriter, functions, nestedLevel + 1, false);
+                }
             }
             else
             {
-                PerformBlock(ElseBlock, streamWriter, functions, nestedLevel, newLine);
+                // if (ElseBlock.Count() > 0)
+                // {
+                //     PerformBlock(ElseBlock, streamWriter, functions, nestedLevel, newLine);
+                // }
+                foreach (var instrucion in ElseBlock)
+                {
+                    instrucion.Execute(streamWriter, functions, nestedLevel + 1, false);
+                }
             }
         }
 
@@ -46,6 +57,10 @@ namespace TKOM.Structures.IR
 
             if ((IfExpression.Condition.GetType() == typeof(SimpleCondition)))
             {
+                if (IfExpression.Negated)
+                {
+                    return !CheckSimpleCondition(lhsToken);
+                }
                 return CheckSimpleCondition(lhsToken);
             }
             var conditionWithValue = (ConditionWithValue)IfExpression.Condition;

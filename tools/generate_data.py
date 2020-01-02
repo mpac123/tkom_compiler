@@ -12,13 +12,17 @@ def generate_data(start_date, end_date, api_key = "DEMO_KEY"):
 with open('NASA_API_key.json') as f:
     api_key = json.load(f)
 
-data = generate_data("2019-01-01", "2019-01-01", api_key)
+date_from = "2019-01-02"
+date_to = "2019-01-05"
+data = generate_data(date_from, date_to, api_key)
 
+out = {'date_range_from': date_from, 'date_range_to': date_to, 'asteroids_by_day': []}
 
 for key, asteroids_list in data['near_earth_objects'].items():
-    out = {'date': key, 'asteroids': []}
+    
+    asteroids = []
     for asteroid in asteroids_list:
-        out['asteroids'].append({
+        asteroids.append({
             'name': asteroid['name'],
             'nasa_jpl_url': asteroid['nasa_jpl_url'],
             'absolute_magnitude_h': asteroid['absolute_magnitude_h'],
@@ -29,6 +33,7 @@ for key, asteroids_list in data['near_earth_objects'].items():
             'relative_velocity_km_s': "%.3f" % float(asteroid['close_approach_data'][0]['relative_velocity']['kilometers_per_second']),
             'miss_distance_lunar': "%.3f" % float(asteroid['close_approach_data'][0]['miss_distance']['lunar'])
         })
+    out['asteroids_by_day'].append({'date': key, 'asteroids': asteroids})
 
-    with open(os.path.join('..', 'data', '%s.json' % key), "w") as res:
-        json.dump(out, res, indent=2)
+with open(os.path.join('..', 'data', '%s_%s.json' % (date_from, date_to)), "w") as res:
+    json.dump(out, res, indent=2)
