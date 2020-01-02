@@ -46,12 +46,23 @@ namespace TKOM.Structures.IR
         protected void PerformBlock(List<Executable> block, StreamWriter streamWriter,
             Dictionary<string, Block> functions, int nestedLevel, bool newLine)
         {
-            if (block.Count() == 1 &&
-                (block.First().GetType() == typeof(LiteralInstruction)
-                || block.First().GetType() == typeof(ValueOfInstruction)
-                || block.First().GetType() == typeof(IfInstruction)))
+            if (block.Count() == 0)
             {
-                block.First().Execute(streamWriter, functions, nestedLevel, false);
+                return;
+            }
+            if ((block.Count() == 1 &&
+                    (block.First().GetType() == typeof(LiteralInstruction)
+                    || block.First().GetType() == typeof(ValueOfInstruction)
+                    || block.First().GetType() == typeof(IfInstruction)
+                    || block.First().GetType() == typeof(FunctionCallInstruction)
+                    || block.First().GetType() == typeof(ForInstruction)))
+                || (block.All(i => i.GetType() == typeof(LiteralInstruction)
+                    || i.GetType() == typeof(ValueOfInstruction))))
+            {
+                foreach (var instrucion in block)
+                {
+                    instrucion.Execute(streamWriter, functions, nestedLevel, false);
+                }
             }
             else
             {
