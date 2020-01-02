@@ -40,7 +40,7 @@ namespace TKOM.Tools
 
         public bool TryReadText()
         {
-            SkipNewLines();
+            SkipWhitespaces();
             var buffer = new StringBuilder();
             while (IsAllowedInText())
             {
@@ -263,7 +263,8 @@ namespace TKOM.Tools
             {
                 _reader.Read();
                 if (!(_reader.CurrentSign == '"'
-                 || _reader.CurrentSign == '\\'))
+                 || _reader.CurrentSign == '\\' 
+                 || _reader.CurrentSign == '{'))
                 {
                     _reader.Rewind(1);
                 }
@@ -312,8 +313,9 @@ namespace TKOM.Tools
 
         private bool IsAllowedInString()
         {
-            // the only thing that is not allowed inside string is "
-            if (_reader.CurrentSign == -1 || _reader.CurrentSign == '"')
+            // the only thing that is not allowed inside string is " or {}
+            if (_reader.CurrentSign == -1 || _reader.CurrentSign == '"'
+                || _reader.CurrentSign == '{')
             {
                 return false;
             }

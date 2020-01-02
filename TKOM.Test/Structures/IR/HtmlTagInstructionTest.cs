@@ -16,8 +16,14 @@ namespace TKOM.Test.Structures.IR
             var htmlInstruction = new HtmlTagInstruction(null, new HtmlTag
             {
                 TagName = "div",
-                Attributes = new List<(string, string)> {
-                    ("style", "{color: \"blue\"}")
+                Attributes = new List<(string, StringValue)> {
+                    ("style", new StringValue {
+                        StringComponents = new List<IStringComponent> {
+                            new Literal {
+                                Content = "{color: \"blue\"}"
+                                }
+                            }
+                        })
                 }
             });
 
@@ -48,9 +54,15 @@ namespace TKOM.Test.Structures.IR
             var htmlInstruction = new HtmlTagInstruction(outer_scope, new HtmlTag
             {
                 TagName = "div",
-                Attributes = new List<(string, string)> {
-                    ("style", "{color: \"blue\"}")
-                },
+                Attributes = new List<(string, StringValue)> {
+                    ("style", new StringValue {
+                        StringComponents = new List<IStringComponent> {
+                            new Literal {
+                                Content = "{color: \"blue\"}"
+                                }
+                            }
+                        })
+                }
             });
             htmlInstruction.Block.Add(new ValueOfInstruction(outer_scope, new ValueOf
             {
@@ -70,7 +82,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div style=\"{color: \"blue\"}\">\n  val2\n</div>", streamReader.ReadToEnd());
+            Assert.Equal("<div style=\"{color: \"blue\"}\">val2</div>", streamReader.ReadToEnd());
 
         }
     }

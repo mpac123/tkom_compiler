@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TKOM.Structures.AST;
 
 namespace TKOM.Structures.IR
@@ -12,8 +13,8 @@ namespace TKOM.Structures.IR
             Block = new List<Executable>();
         }
 
-        public HtmlTag HtmlTag {private get; set;}
-        public List<Executable> Block {set; get;}
+        public HtmlTag HtmlTag { private get; set; }
+        public List<Executable> Block { set; get; }
 
 
         public override void Execute(StreamWriter streamWriter, Dictionary<string, Block> functions, int nestedLevel, bool newLine)
@@ -22,14 +23,11 @@ namespace TKOM.Structures.IR
             streamWriter.Write($"<{HtmlTag.TagName}");
             foreach (var attribute in HtmlTag.Attributes)
             {
-                streamWriter.Write($" {attribute.attributeName}=\"{attribute.attributeValue}\"");
+                streamWriter.Write($" {attribute.attributeName}=\"{StringValueBuilder.Build(attribute.attributeValue, Scope)}\"");
             }
             streamWriter.Write($">");
-            foreach (var instrucion in Block)
-            {
-                instrucion.Execute(streamWriter, functions, nestedLevel + 1, true);
-            }
-            streamWriter.Write($"\n</{HtmlTag.TagName}>");
+            PerformBlock(Block, streamWriter, functions, nestedLevel, newLine);
+            streamWriter.Write($"</{HtmlTag.TagName}>");
         }
 
     }

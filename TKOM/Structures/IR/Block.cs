@@ -59,10 +59,9 @@ namespace TKOM.Structures.IR
                     Dictionary<string, Block> functions,
                     int nestedLevel, bool newLine)
         {
-            base.Execute(streamWriter, functions, nestedLevel, newLine);
             foreach (var block in NestedBlocks)
             {
-                block.Execute(streamWriter, functions, nestedLevel + 1, newLine);
+                block.Execute(streamWriter, functions, nestedLevel, true);
             }
         }
     }

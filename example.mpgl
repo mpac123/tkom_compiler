@@ -3,16 +3,25 @@
         <td style="color:{color}">{asteroid.name}</td>
         <td><a href="{asteroid.nasa_jpl_url}">Url</a></td>
         <td>
-            <:if (asteroid.relative_velocity_km_s > 15.0)>
+            <:if (asteroid.relative_velocity_km_s > 12)>
                 <b>{asteroid.relative_velocity_km_s}</b>
             </:if>
             <:else>
                 {asteroid.relative_velocity_km_s}
             </:else>
         </td>
-        <td>{asteroid.estimated_diameter_min_meters} 
-            - {asteroid.estimated_diameter_max_meters}</td>
+        <td>{asteroid.estimated_diameter_min_meters} - {asteroid.estimated_diameter_max_meters}</td>
         <td>{asteroid.miss_distance_lunar}</td>
+    </tr>
+</:def>
+
+<:def header()>
+    <tr>
+        <th>Name</th>
+        <th>Webpage</th>
+        <th>Relative velocity</th>
+        <th>Estimated diameter</th>
+        <th>Miss distance [lunar]</th>
     </tr>
 </:def>
 
@@ -24,6 +33,7 @@
     <body>
         <div>
             <table>
+                {header()}
                 <:for (asteroid in model.asteroids)>
                     <:if (asteroid.is_potentially_hazardous_asteroid)>
                         {row(asteroid, "red")}

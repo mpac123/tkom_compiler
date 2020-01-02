@@ -207,9 +207,13 @@ namespace TKOM.Test.Structures.IR
                         }
                     },
                     ConditionType = ConditionType.Equal,
-                    RightHandSideVariable = new Literal
+                    RightHandSideVariable = new StringValue
                     {
-                        Content = "literal"
+                        StringComponents = new List<IStringComponent> {
+                            new Literal {
+                                Content = "literal"
+                            }
+                        }
                     }
 
                 }
@@ -256,9 +260,13 @@ namespace TKOM.Test.Structures.IR
                         }
                     },
                     ConditionType = ConditionType.Equal,
-                    RightHandSideVariable = new Literal
+                    RightHandSideVariable = new StringValue
                     {
-                        Content = "literal"
+                        StringComponents = new List<IStringComponent> {
+                            new Literal {
+                                Content = "literal"
+                            }
+                        }
                     }
 
                 }
@@ -305,9 +313,13 @@ namespace TKOM.Test.Structures.IR
                         }
                     },
                     ConditionType = ConditionType.NotEqual,
-                    RightHandSideVariable = new Literal
+                    RightHandSideVariable = new StringValue
                     {
-                        Content = "literal"
+                        StringComponents = new List<IStringComponent> {
+                            new Literal {
+                                Content = "literal"
+                            }
+                        }
                     }
 
                 }
@@ -354,9 +366,13 @@ namespace TKOM.Test.Structures.IR
                         }
                     },
                     ConditionType = ConditionType.NotEqual,
-                    RightHandSideVariable = new Literal
+                    RightHandSideVariable = new StringValue
                     {
-                        Content = "literal"
+                        StringComponents = new List<IStringComponent> {
+                            new Literal {
+                                Content = "literal"
+                            }
+                        }
                     }
 
                 }

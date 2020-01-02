@@ -278,7 +278,7 @@ namespace TKOM.Tools
         {
             if (_scanner.Token.Type == TokenType.QuotationMark)
             {
-                return ParseLiteral();
+                return ParseString();
             }
             else if (_scanner.Token.Type == TokenType.Number)
             {
@@ -293,18 +293,29 @@ namespace TKOM.Tools
 
         }
 
-        private Literal ParseLiteral()
+        private StringValue ParseString()
         {
-            var stringValue = new Literal();
-            if (!_scanner.TryReadString())
+            var stringValue = new StringValue();
+            do
             {
-                stringValue.Content = "";
-            }
-            else
-            {
-                stringValue.Content = _scanner.Token.Value;
-            }
-            _scanner.ReadNextToken();
+                if (!_scanner.TryReadString())
+                {
+                    _scanner.ReadNextToken();
+                    if (_scanner.Token.Type == TokenType.CurlyBracketOpen)
+                    {
+                        _scanner.ReadNextToken();
+                        stringValue.StringComponents.Add(ParseValueOf());
+                        ExpectTokenType(TokenType.CurlyBracketClose);
+                    }
+                }
+                else
+                {
+                    stringValue.StringComponents.Add(new Literal
+                    {
+                        Content = _scanner.Token.Value
+                    });
+                }
+            } while (_scanner.Token.Type != TokenType.QuotationMark);
             ExpectTokenType(TokenType.QuotationMark);
             _scanner.ReadNextToken();
             return stringValue;
@@ -361,9 +372,9 @@ namespace TKOM.Tools
             throw new ParsingException($"Expected '>' or '/>', token of type {_scanner.Token.Type} was found instead.");
         }
 
-        private List<(string attributeName, string attributeValue)> ParseAttributeList()
+        private List<(string attributeName, StringValue attributeValue)> ParseAttributeList()
         {
-            var attributeList = new List<(string attributeName, string attributeValue)>();
+            var attributeList = new List<(string attributeName, StringValue attributeValue)>();
 
             while (_scanner.Token.Type != TokenType.PointyBracketClose && _scanner.Token.Type != TokenType.TagCloseInline)
             {
@@ -374,15 +385,8 @@ namespace TKOM.Tools
                 {
                     _scanner.ReadNextToken();
                     ExpectTokenType(TokenType.QuotationMark);
-                    var value = "";
-                    if (_scanner.TryReadString())
-                    {
-                        value = _scanner.Token.Value;
-                    }
-                    _scanner.ReadNextToken();
-                    ExpectTokenType(TokenType.QuotationMark);
-                    attributeList.Add((name, value));
-                    _scanner.ReadNextToken();
+                    var string_value = ParseString();
+                    attributeList.Add((name, string_value));
                 }
                 else
                 {
@@ -392,7 +396,7 @@ namespace TKOM.Tools
             return attributeList;
         }
 
-        private HtmlTag ParseHtmlTag(string tagName, List<(string, string)> attributeList)
+        private HtmlTag ParseHtmlTag(string tagName, List<(string, StringValue)> attributeList)
         {
             var result = new HtmlTag
             {

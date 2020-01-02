@@ -13,7 +13,7 @@ namespace TKOM.Tools
             _functions_dict = dict;
         }
 
-        public void Execute(string model, string path_out)
+        public void Execute(string model, string path_out, bool addDeclaration)
         {
             var main_fun = _functions_dict["main"];
             main_fun.Initialize(new List<AssignedValue> {
@@ -21,7 +21,10 @@ namespace TKOM.Tools
             });
             using (var f = new StreamWriter(path_out))
             {
-
+                if (addDeclaration)
+                {
+                    f.Write("<!DOCTYPE html>\n<meta charset=\"UTF-8\">");
+                }
                 main_fun.Execute(f, _functions_dict, 0, false);
             }
         }

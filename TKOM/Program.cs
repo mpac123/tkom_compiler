@@ -24,6 +24,10 @@ namespace TKOM
             [Option('o', "output", Required = true,
                 HelpText = "Path to the output file")]
             public string OutputPath { get; set; }
+
+            [Option('d', "declaration", 
+                HelpText = "Add HTML declaration on the top of the file")]
+            public bool AddDeclaration {get; set;}
         }
         static void Main(string[] args)
         {
@@ -53,8 +57,9 @@ namespace TKOM
                         throw new Exception($"File with template could not be read.");
                     }
                     outputPath = opts.OutputPath;
+                    
 
-                    Execute(model, templatePath, outputPath);
+                    Execute(model, templatePath, outputPath, opts.AddDeclaration);
                 });
 
 
@@ -67,7 +72,7 @@ namespace TKOM
             // Console.WriteLine(deserialized.Count());
         }
 
-        private static void Execute(string model, string templatePath, string outputPath)
+        private static void Execute(string model, string templatePath, string outputPath, bool addDeclaration)
         {
             var loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -86,7 +91,7 @@ namespace TKOM
             var functionsDict = sem_checker.CheckAST();
 
             var executor = new Executor(functionsDict);
-            executor.Execute(model, outputPath);
+            executor.Execute(model, outputPath, addDeclaration);
         }
 
     }

@@ -21,7 +21,6 @@ namespace TKOM.Structures.IR
             Dictionary<string, Block> functions,
             int nestedLevel, bool newLine)
         {
-            base.Execute(streamWriter, functions, nestedLevel, newLine);
             streamWriter.Write(ReturnValue().ToString());
         }
 

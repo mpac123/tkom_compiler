@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TKOM.Exceptions;
 
 namespace TKOM.Structures.IR
@@ -11,6 +12,11 @@ namespace TKOM.Structures.IR
         public virtual void Execute(StreamWriter streamWriter,
                 Dictionary<string, Block> functions,
                 int nestedLevel, bool newLine)
+        {
+            Format(streamWriter, nestedLevel, newLine);
+        }
+
+        protected void Format(StreamWriter streamWriter, int nestedLevel, bool newLine)
         {
             if (newLine)
             {
@@ -35,6 +41,26 @@ namespace TKOM.Structures.IR
                 scope = scope.UpperScope;
             }
             throw new RuntimeException($"Value {variableName} could not be found");
+        }
+
+        protected void PerformBlock(List<Executable> block, StreamWriter streamWriter,
+            Dictionary<string, Block> functions, int nestedLevel, bool newLine)
+        {
+            if (block.Count() == 1 &&
+                (block.First().GetType() == typeof(LiteralInstruction)
+                || block.First().GetType() == typeof(ValueOfInstruction)
+                || block.First().GetType() == typeof(IfInstruction)))
+            {
+                block.First().Execute(streamWriter, functions, nestedLevel, false);
+            }
+            else
+            {
+                foreach (var instrucion in block)
+                {
+                    instrucion.Execute(streamWriter, functions, nestedLevel + 1, true);
+                }
+                Format(streamWriter, nestedLevel, true);
+            }
         }
     }
 }

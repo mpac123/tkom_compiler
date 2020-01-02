@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using TKOM.Exceptions;
 using TKOM.Structures.AST;
@@ -20,7 +21,6 @@ namespace TKOM.Structures.IR
             Dictionary<string, Block> functions,
             int nestedLevel, bool newLine)
         {
-            base.Execute(streamWriter, functions, nestedLevel, newLine);
             var functionBlock = functions[FunctionCall.FunctionName];
             var assignedValues = new List<AssignedValue>();
             foreach (var argumentCall in FunctionCall.ArgumentValues)
@@ -34,10 +34,10 @@ namespace TKOM.Structures.IR
                         NumericValue = numericVal.Integer ? numericVal.IntValue : numericVal.RealValue
                     });
                 }
-                else if (argumentCall.GetType() == typeof(Literal))
+                else if (argumentCall.GetType() == typeof(StringValue))
                 {
-                    var literalValue = (Literal)argumentCall;
-                    assignedValues.Add(new AssignedValue(JsonConvert.SerializeObject(literalValue.Content)));
+                    var stringValue = (StringValue)argumentCall;
+                    assignedValues.Add(new AssignedValue(JsonConvert.SerializeObject(StringValueBuilder.Build(stringValue, Scope))));
                 }
                 else if (argumentCall.GetType() == typeof(ValueOf))
                 {

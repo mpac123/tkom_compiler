@@ -61,7 +61,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions);
             Assert.Equal("function", tree.Functions.First().Identifier);
             Assert.NotEmpty(tree.Functions.First().Arguments);
-            Assert.Equal(1, tree.Functions.First().Arguments.Count());
+            Assert.Single(tree.Functions.First().Arguments);
             Assert.Equal("arg1", tree.Functions.First().Arguments.First());
             Assert.Empty(tree.Functions.First().Instructions);
         }
@@ -104,7 +104,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions);
             Assert.Equal("function", tree.Functions.First().Identifier);
             Assert.NotEmpty(tree.Functions.First().Arguments);
-            Assert.Equal(1, tree.Functions.First().Arguments.Count());
+            Assert.Single(tree.Functions.First().Arguments);
             Assert.Equal("arg1", tree.Functions.First().Arguments.First());
             Assert.Empty(tree.Functions.First().Instructions);
         }
@@ -125,7 +125,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions);
             Assert.Equal("function", tree.Functions.First().Identifier);
             Assert.NotEmpty(tree.Functions.First().Arguments);
-            Assert.Equal(1, tree.Functions.First().Arguments.Count());
+            Assert.Single(tree.Functions.First().Arguments);
             Assert.Equal("arg1", tree.Functions.First().Arguments.First());
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(Literal), tree.Functions.First().Instructions.First().GetType());
@@ -149,7 +149,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something\n", ((Literal)ifExpression.Instructions.First()).Content);
             Assert.Equal(typeof(SimpleCondition), ifExpression.Condition.GetType());
@@ -176,7 +176,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something\n", ((Literal)ifExpression.Instructions.First()).Content);
             Assert.Equal(typeof(SimpleCondition), ifExpression.Condition.GetType());
@@ -205,7 +205,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.False(ifExpression.Negated);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something\n", ((Literal)ifExpression.Instructions.First()).Content);
@@ -235,7 +235,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.True(ifExpression.Negated);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something\n", ((Literal)ifExpression.Instructions.First()).Content);
@@ -263,7 +263,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.True(ifExpression.Negated);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something\n", ((Literal)ifExpression.Instructions.First()).Content);
@@ -293,7 +293,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something\n", ((Literal)ifExpression.Instructions.First()).Content);
             Assert.Equal(typeof(ConditionWithValue), ifExpression.Condition.GetType());
@@ -431,13 +431,13 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something", ((Literal)ifExpression.Instructions.First()).Content);
             Assert.Equal(typeof(ConditionWithValue), ifExpression.Condition.GetType());
             var stringCondition = (ConditionWithValue)ifExpression.Condition;
-            Assert.Equal(typeof(Literal), stringCondition.RightHandSideVariable.GetType());
-            Assert.Equal("str ing", ((Literal)stringCondition.RightHandSideVariable).Content);
+            Assert.Equal(typeof(Literal), ((StringValue)stringCondition.RightHandSideVariable).StringComponents.First().GetType());
+            Assert.Equal("str ing", ((Literal)((StringValue)stringCondition.RightHandSideVariable).StringComponents.First()).Content);
             Assert.Equal(typeof(ValueOf), ifExpression.Condition.LeftHandSideVariable.GetType());
             Assert.Equal("cond", ifExpression.Condition.LeftHandSideVariable.VariableName);
             Assert.Null(ifExpression.Condition.LeftHandSideVariable.Index);
@@ -462,7 +462,7 @@ namespace TKOM.Test.Tools
             Assert.NotEmpty(tree.Functions.First().Instructions);
             Assert.Equal(typeof(IfExpression), tree.Functions.First().Instructions.First().GetType());
             var ifExpression = (IfExpression)tree.Functions.First().Instructions.First();
-            Assert.Equal(1, ifExpression.Instructions.Count());
+            Assert.Single(ifExpression.Instructions);
             Assert.Equal(typeof(Literal), ifExpression.Instructions.First().GetType());
             Assert.Equal("do something", ((Literal)ifExpression.Instructions.First()).Content);
             Assert.Equal(typeof(ConditionWithValue), ifExpression.Condition.GetType());
@@ -669,7 +669,7 @@ namespace TKOM.Test.Tools
             Assert.Equal("a", forExpression.TagName);
             Assert.Single(forExpression.Attributes);
             Assert.Equal("href", forExpression.Attributes.First().attributeName);
-            Assert.Equal("...", forExpression.Attributes.First().attributeValue);
+            Assert.Equal("...", ((Literal)forExpression.Attributes.First().attributeValue.StringComponents.First()).Content);
             Assert.NotEmpty(forExpression.Instructions);
 
         }
@@ -696,7 +696,7 @@ namespace TKOM.Test.Tools
             Assert.Equal("a", htmlExpression.TagName);
             Assert.NotEmpty(htmlExpression.Attributes);
             Assert.Equal("href", htmlExpression.Attributes.First().attributeName);
-            Assert.Equal("...", htmlExpression.Attributes.First().attributeValue);
+            Assert.Equal("...", ((Literal)htmlExpression.Attributes.First().attributeValue.StringComponents.First()).Content);
             Assert.Empty(htmlExpression.Instructions);
 
         }
@@ -725,7 +725,7 @@ namespace TKOM.Test.Tools
             Assert.Equal("a", htmlExpression.TagName);
             Assert.Equal(2, htmlExpression.Attributes.Count());
             Assert.Equal("href", htmlExpression.Attributes.First().attributeName);
-            Assert.Equal("...", htmlExpression.Attributes.First().attributeValue);
+            Assert.Equal("...", ((Literal)htmlExpression.Attributes.First().attributeValue.StringComponents.First()).Content);
             Assert.Equal("hidden", htmlExpression.Attributes.Skip(1).First().attributeName);
             Assert.Null(htmlExpression.Attributes.Skip(1).First().attributeValue);
             Assert.NotEmpty(htmlExpression.Instructions);
@@ -857,9 +857,9 @@ namespace TKOM.Test.Tools
             Assert.Equal(typeof(FunctionCall), tree.Functions.First().Instructions.First().GetType());
             var functionCall = (FunctionCall)tree.Functions.First().Instructions.First();
             Assert.Equal("function", functionCall.FunctionName);
-            Assert.Equal(1, functionCall.ArgumentValues.Count());
-            Assert.Equal(typeof(Literal), functionCall.ArgumentValues.First().GetType());
-            var valueOf1 = (Literal)functionCall.ArgumentValues.First();
+            Assert.Single(functionCall.ArgumentValues);
+            Assert.Equal(typeof(Literal), ((StringValue)functionCall.ArgumentValues.First()).StringComponents.First().GetType());
+            var valueOf1 = (Literal)((StringValue)functionCall.ArgumentValues.First()).StringComponents.First();
             Assert.Equal("string", valueOf1.Content);
 
         }
@@ -884,7 +884,7 @@ namespace TKOM.Test.Tools
             Assert.Equal(typeof(FunctionCall), tree.Functions.First().Instructions.First().GetType());
             var functionCall = (FunctionCall)tree.Functions.First().Instructions.First();
             Assert.Equal("function", functionCall.FunctionName);
-            Assert.Equal(1, functionCall.ArgumentValues.Count());
+            Assert.Single(functionCall.ArgumentValues);
             Assert.Equal(typeof(NumericValue), functionCall.ArgumentValues.First().GetType());
             var valueOf1 = (NumericValue)functionCall.ArgumentValues.First();
             Assert.Equal(5, valueOf1.IntValue);
@@ -912,7 +912,7 @@ namespace TKOM.Test.Tools
             Assert.Equal(typeof(FunctionCall), tree.Functions.First().Instructions.First().GetType());
             var functionCall = (FunctionCall)tree.Functions.First().Instructions.First();
             Assert.Equal("function", functionCall.FunctionName);
-            Assert.Equal(1, functionCall.ArgumentValues.Count());
+            Assert.Single(functionCall.ArgumentValues);
             Assert.Equal(typeof(NumericValue), functionCall.ArgumentValues.First().GetType());
             var valueOf1 = (NumericValue)functionCall.ArgumentValues.First();
             Assert.Equal(5.256, valueOf1.RealValue);
@@ -945,8 +945,8 @@ namespace TKOM.Test.Tools
             var valueOf1 = (NumericValue)functionCall.ArgumentValues.First();
             Assert.Equal(5.256, valueOf1.RealValue);
             Assert.False(valueOf1.Integer);
-            Assert.Equal(typeof(Literal), functionCall.ArgumentValues.Skip(1).First().GetType());
-            var valueOf2 = (Literal)functionCall.ArgumentValues.Skip(1).First();
+            Assert.Equal(typeof(Literal), ((StringValue)functionCall.ArgumentValues.Skip(1).First()).StringComponents.First().GetType());
+            var valueOf2 = (Literal)((StringValue)functionCall.ArgumentValues.Skip(1).First()).StringComponents.First();
             Assert.Equal("string", valueOf2.Content);
             Assert.Equal(typeof(ValueOf), functionCall.ArgumentValues.Skip(2).First().GetType());
             var valueOf3 = (ValueOf)functionCall.ArgumentValues.Skip(2).First();
@@ -1026,6 +1026,29 @@ namespace TKOM.Test.Tools
             Assert.Equal(typeof(Literal), forInstruction.Instructions.Skip(1).First().GetType());
 
 
+        }
+
+        [Fact]
+        public void StringWithNestedValue_Parse_ReturnsCorrectAST()
+        {
+            // prepare
+            var reader = new StringsReader("<:def function(color)>" +
+                                                "<h1 style=\"color={color}\">Title</h1>" +
+                                            "</:def>\n\n");
+            var scanner = new Scanner(reader);
+            var logger = new Mock<ILogger<Parser>>();
+            var parser = new Parser(scanner, logger.Object);
+
+            // act 
+            var tree = parser.Parse();
+
+            // validate
+            var htmlTag = (HtmlTag)tree.Functions.First().Instructions.First();
+            Assert.Equal(2, htmlTag.Attributes.First().attributeValue.StringComponents.Count());
+            Assert.Equal(typeof(Literal), htmlTag.Attributes.First().attributeValue.StringComponents.First().GetType());
+            Assert.Equal("color=", ((Literal)htmlTag.Attributes.First().attributeValue.StringComponents.First()).Content);
+            Assert.Equal(typeof(ValueOf), htmlTag.Attributes.First().attributeValue.StringComponents.Skip(1).First().GetType());
+            Assert.Equal("color", ((ValueOf)htmlTag.Attributes.First().attributeValue.StringComponents.Skip(1).First()).VariableName);
         }
     }
 }

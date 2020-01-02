@@ -22,8 +22,6 @@ namespace TKOM.Structures.IR
 
         public override void Execute(StreamWriter streamWriter, Dictionary<string, Block> functions, int nestedLevel, bool newLine)
         {
-            base.Execute(streamWriter, functions, nestedLevel, newLine);
-
             // find the exact part of given input that will be iterated
             var valueOfInstruction = new ValueOfInstruction(Scope, ForExpression.Collection);
             var collection = valueOfInstruction.ReturnValue().ToList();

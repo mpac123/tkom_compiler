@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using TKOM.Exceptions;
 using TKOM.Structures.AST;
@@ -27,20 +28,13 @@ namespace TKOM.Structures.IR
             Dictionary<string, Block> functions,
             int nestedLevel, bool newLine)
         {
-            base.Execute(streamWriter, functions, nestedLevel, newLine);
             if (IsComparisonTrue())
             {
-                foreach (var instr in IfBlock)
-                {
-                    instr.Execute(streamWriter, functions, nestedLevel, newLine);
-                }
+                PerformBlock(IfBlock, streamWriter, functions, nestedLevel, newLine);
             }
             else
             {
-                foreach (var instr in ElseBlock)
-                {
-                    instr.Execute(streamWriter, functions, nestedLevel, newLine);
-                }
+                PerformBlock(ElseBlock, streamWriter, functions, nestedLevel, newLine);
             }
         }
 
@@ -55,10 +49,10 @@ namespace TKOM.Structures.IR
                 return CheckSimpleCondition(lhsToken);
             }
             var conditionWithValue = (ConditionWithValue)IfExpression.Condition;
-            if (conditionWithValue.RightHandSideVariable.GetType() == typeof(Literal))
+            if (conditionWithValue.RightHandSideVariable.GetType() == typeof(StringValue))
             {
-                var rhs = (Literal)conditionWithValue.RightHandSideVariable;
-                return CheckConditionWithLiteral(lhsToken, rhs, conditionWithValue.ConditionType);
+                var rhs = (StringValue)conditionWithValue.RightHandSideVariable;
+                return CheckConditionWithString(lhsToken, rhs, conditionWithValue.ConditionType);
 
             }
             if (conditionWithValue.RightHandSideVariable.GetType() == typeof(NumericValue))
@@ -88,7 +82,7 @@ namespace TKOM.Structures.IR
             return result;
         }
 
-        private bool CheckConditionWithLiteral(JToken lhsToken, Literal rhs, ConditionType conditionType)
+        private bool CheckConditionWithString(JToken lhsToken, StringValue rhs, ConditionType conditionType)
         {
             string lhsLiteral;
             try
@@ -101,11 +95,11 @@ namespace TKOM.Structures.IR
             }
             if (conditionType == ConditionType.Equal)
             {
-                return (lhsLiteral == rhs.Content);
+                return (lhsLiteral == StringValueBuilder.Build(rhs, Scope));
             }
             else if (conditionType == ConditionType.NotEqual)
             {
-                return (lhsLiteral != rhs.Content);
+                return (lhsLiteral != StringValueBuilder.Build(rhs, Scope));
             }
             throw new RuntimeException($"Cannot make comparison of type {conditionType.ToString()} when comparing with a literal.");
         }
@@ -158,7 +152,7 @@ namespace TKOM.Structures.IR
                     return TryCompareValuesOfAsNumericValues(lhsToken, rhsToken, conditionType);
                 default:
                     throw new RuntimeException($"Unknown condition type: {conditionType.ToString()}");
-                    
+
             }
         }
 
