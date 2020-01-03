@@ -33,7 +33,7 @@ namespace TKOM.Structures.IR
                 //PerformBlock(IfBlock, streamWriter, functions, nestedLevel, newLine);
                 foreach (var instrucion in IfBlock)
                 {
-                    instrucion.Execute(streamWriter, functions, nestedLevel + 1, false);
+                    instrucion.Execute(streamWriter, functions, nestedLevel, false);
                 }
             }
             else
@@ -44,7 +44,7 @@ namespace TKOM.Structures.IR
                 // }
                 foreach (var instrucion in ElseBlock)
                 {
-                    instrucion.Execute(streamWriter, functions, nestedLevel + 1, false);
+                    instrucion.Execute(streamWriter, functions, nestedLevel, false);
                 }
             }
         }

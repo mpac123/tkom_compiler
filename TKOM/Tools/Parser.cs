@@ -12,14 +12,14 @@ namespace TKOM.Tools
     public class Parser
     {
         private Scanner _scanner;
-        private readonly ILogger<Parser> _logger;
-        public Parser(Scanner scanner, ILogger<Parser> logger)
+        public Parser(Scanner scanner)
         {
             _scanner = scanner;
         }
         public Structures.AST.Program Parse()
         {
             var syntaxTree = new Structures.AST.Program();
+
             _scanner.ReadNextToken();
             var function = ParseFunction();
             while (function != null)
@@ -27,7 +27,9 @@ namespace TKOM.Tools
                 syntaxTree.Functions.Add(function);
                 function = ParseFunction();
             }
+
             return syntaxTree;
+
         }
 
         private Function ParseFunction()

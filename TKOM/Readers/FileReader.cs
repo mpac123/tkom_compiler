@@ -16,8 +16,8 @@ namespace TKOM.Readers
 
         public FileReader(string path)
         {
-            Line = 0;
-            Column = 0;
+            Line = 1;
+            Column = 1;
             _fstream = File.OpenRead(path);
             Read();
         }
@@ -48,6 +48,7 @@ namespace TKOM.Readers
             if (CurrentSign == '\n')
             {
                 Line += 1;
+                Column = 1;
             }
             else
             {
@@ -58,6 +59,7 @@ namespace TKOM.Readers
         public void Rewind(int numSigns)
         {
             _fstream.Seek(-(numSigns + 1), SeekOrigin.Current);
+            Column -= numSigns;
             Read();
         }
     }

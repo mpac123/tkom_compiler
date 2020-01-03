@@ -12,7 +12,7 @@ namespace TKOM.Structures.IR
         public ForInstruction(Scope scope, ForExpression forExpression) : base(scope)
         {
             ForExpression = forExpression;
-            Block = new Block(scope, new List<string> {forExpression.ElementName});
+            Block = new Block(scope, new List<string> {forExpression.ElementName}, scope.FunctionName);
         }
 
         public ForExpression ForExpression {private set; get;}

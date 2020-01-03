@@ -16,7 +16,7 @@ namespace TKOM.Test.Structures.IR
         {
             // prepare
             var variables = new List<string> { "arg1" };
-            var functionBlock = new Block(null, variables);
+            var functionBlock = new Block(null, variables, "fun");
             var functionDictionary = new Dictionary<string, Block> {
                 {"function", functionBlock}
             };
@@ -51,7 +51,7 @@ namespace TKOM.Test.Structures.IR
         {
             // prepare
             var variables = new List<string> { "arg1" };
-            var functionBlock = new Block(null, variables);
+            var functionBlock = new Block(null, variables, "fun");
             var functionDictionary = new Dictionary<string, Block> {
                 {"function", functionBlock}
             };
@@ -93,7 +93,7 @@ namespace TKOM.Test.Structures.IR
         {
             // prepare
             var variables = new List<string> { "arg1" };
-            var functionBlock = new Block(null, variables);
+            var functionBlock = new Block(null, variables, "fun");
             functionBlock.NestedBlocks.Add(new ValueOfInstruction(functionBlock.Scope, new ValueOf {
                 VariableName = "arg1"
             }));

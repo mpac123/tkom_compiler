@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CommandLine;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using TKOM.Exceptions;
 using TKOM.Readers;
 using TKOM.Tools;
 
@@ -25,9 +22,9 @@ namespace TKOM
                 HelpText = "Path to the output file")]
             public string OutputPath { get; set; }
 
-            [Option('d', "declaration", 
+            [Option('d', "declaration",
                 HelpText = "Add HTML declaration on the top of the file")]
-            public bool AddDeclaration {get; set;}
+            public bool AddDeclaration { get; set; }
         }
         static void Main(string[] args)
         {
@@ -57,7 +54,7 @@ namespace TKOM
                         throw new Exception($"File with template could not be read.");
                     }
                     outputPath = opts.OutputPath;
-                    
+
 
                     Execute(model, templatePath, outputPath, opts.AddDeclaration);
                 });
@@ -77,21 +74,41 @@ namespace TKOM
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
-                    .AddFilter("TKOM.Tools.Parser", LogLevel.Debug)
+                    .AddFilter("TKOM.Program", LogLevel.Debug)
                     .AddConsole();
             });
-            ILogger<Tools.Parser> logger = loggerFactory.CreateLogger<Tools.Parser>();
+            ILogger<Program> logger = loggerFactory.CreateLogger<Program>();
 
             var fileReader = new FileReader(templatePath);
             var scanner = new Scanner(fileReader);
-            var parser = new Tools.Parser(scanner, logger);
+            var parser = new Tools.Parser(scanner);
+            try
+            {
+                logger.LogInformation("About to parse...");
+                var tree = parser.Parse();
 
-            var tree = parser.Parse();
-            var sem_checker = new SemanticsChecker(tree);
-            var functionsDict = sem_checker.CheckAST();
+                var sem_checker = new SemanticsChecker(tree);
+                var functionsDict = sem_checker.CheckAST();
 
-            var executor = new Executor(functionsDict);
-            executor.Execute(model, outputPath, addDeclaration);
+                var executor = new Executor(functionsDict);
+                executor.Execute(model, outputPath, addDeclaration);
+            }
+            catch (ParsingException e)
+            {
+                logger.LogError($"{scanner.Token.Line}:{scanner.Token.Column} Parsing error:\n{e.Message}\n\nBuild failed. Try to compile after fixing the error.");
+                return;
+            }
+            catch (SemanticsException e)
+            {
+                logger.LogError($"Semantics exception: \n{e.Message}\n\nBuild failed. Try to compile after fixing the error.");
+                return;
+            }
+            catch (RuntimeException e)
+            {
+                logger.LogError($"Runtime exception: \n{e.Message}\n\nBuild failed. Try to compile after fixing the error.");
+                return;
+            }
+            logger.LogInformation("The file has been parsed successfully!");
         }
 
     }

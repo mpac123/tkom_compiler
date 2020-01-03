@@ -29,7 +29,7 @@ namespace TKOM.Tools
         {
             foreach (var function in _program.Functions)
             {
-                if (!_functions.TryAdd(function.Identifier, new Block(null, function.Arguments)))
+                if (!_functions.TryAdd(function.Identifier, new Block(null, function.Arguments, function.Identifier)))
                 {
                     throw new SemanticsException($"The function {function.Identifier} has already been defined.");
                 }
@@ -146,7 +146,7 @@ namespace TKOM.Tools
             // check if the value to be iterated over exists in the scope
             if (!scope.Variables.Contains(forExpression.Collection.VariableName))
             {
-                throw new SemanticsException($"Variable {forExpression.Collection.VariableName} has not been declared in the scope.");
+                throw new SemanticsException($"Variable {forExpression.Collection.VariableName} has not been declared in the scope of operation for in function {scope.FunctionName}.");
             }
             var forInstruction = new ForInstruction(scope, forExpression);
             PopulateInstructions(forExpression.Instructions, forInstruction.Block.NestedBlocks, forInstruction.Block.Scope);
@@ -159,7 +159,7 @@ namespace TKOM.Tools
             Block function_block;
             if (!_functions.TryGetValue(functionCall.FunctionName, out function_block))
             {
-                throw new SemanticsException($"Function {functionCall.FunctionName} has not been declared in the scope.");
+                throw new SemanticsException($"Function {functionCall.FunctionName} has not been declared in the scope of the function {scope.FunctionName}.");
             }
 
             // check if called arguments exist in the scope
@@ -169,7 +169,7 @@ namespace TKOM.Tools
                 {
                     if (!scope.Variables.Contains(((ValueOf) argument).VariableName))
                     {
-                        throw new SemanticsException($"Variable {((ValueOf) argument).VariableName} has not been declared in the scope.");
+                        throw new SemanticsException($"Variable {((ValueOf) argument).VariableName} has not been declared in the scope of the function {scope.FunctionName}.");
                     }
                 }
             }
@@ -203,7 +203,7 @@ namespace TKOM.Tools
             // check if value has been declared in the scope
             if (!scope.Variables.Contains(valueOf.VariableName))
             {
-                throw new SemanticsException($"Variable {valueOf.VariableName} has not been declared in the scope.");
+                throw new SemanticsException($"Variable {valueOf.VariableName} has not been declared in the scope of function {scope.FunctionName}.");
             }
 
             var valueOfInstruction = new ValueOfInstruction(scope, valueOf);

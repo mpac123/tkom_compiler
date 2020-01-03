@@ -16,7 +16,7 @@ namespace TKOM.Structures.IR
 
         public override void Execute(StreamWriter streamWriter, Dictionary<string, Block> functions, int nestedLevel, bool newLine)
         {
-            base.Execute(streamWriter, functions, nestedLevel, newLine);
+            base.Execute(streamWriter, functions, nestedLevel, true);
             streamWriter.Write($"<{HtmlInlineTag.TagName}");
             foreach (var attribute in HtmlInlineTag.Attributes)
             {

@@ -2,10 +2,11 @@ namespace TKOM.Utils
 {
     public class Token
     {
-        public enum TokenType {
+        public enum TokenType
+        {
             Text,
             Number,
-            Identifier,        
+            Identifier,
             CurlyBracketOpen,
             CurlyBracketClose,
             ParenthesisOpen,
@@ -35,19 +36,24 @@ namespace TKOM.Utils
 
         }
 
-        public Token(TokenType type)
+        public Token(TokenType type, int line, int column)
         {
             Type = type;
+            Column = column - 1;
+            Line = line;
         }
 
-        public Token(TokenType type, string value)
+        public Token(TokenType type, string value, int line, int column)
         {
             Type = type;
             Value = value;
+            Column = column - 1;
+            Line = line;
         }
-        public TokenType Type {private set; get;}
-        public string Value {private set; get;}
-        public int Line {private set; get;}
-        public int Column {private set; get;}
+        public TokenType Type { private set; get; }
+        public string Value { private set; get; }
+        public int Line { private set; get; }
+        public int Column { private set; get; }
+
     }
 }

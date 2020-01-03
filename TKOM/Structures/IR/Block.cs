@@ -11,10 +11,10 @@ namespace TKOM.Structures.IR
     {
         public List<Executable> NestedBlocks;
 
-        public Block(Scope upperScope, List<string> variables)
+        public Block(Scope upperScope, List<string> variables, string functionName)
         {
             NestedBlocks = new List<Executable>();
-            Scope = new Scope();
+            Scope = new Scope(functionName);
             Scope.UpperScope = upperScope;
             foreach (var variable in variables)
             {

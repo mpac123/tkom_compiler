@@ -9,7 +9,7 @@
         <td>
             {asteroid.miss_distance_lunar}
             <:if (asteroid.miss_distance_lunar < 10)>
-                <b>!!!</b>
+                <b style="color: teal">!!!</b>
             </:if>
         </td>
     </tr>

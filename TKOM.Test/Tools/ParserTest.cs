@@ -17,7 +17,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -33,7 +33,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function()></:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -52,7 +52,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)></:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -73,7 +73,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1, arg2)></:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -95,7 +95,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -116,7 +116,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\nliteral inside\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -139,7 +139,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -166,7 +166,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond[1].value)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -195,7 +195,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond[1].value[3])>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -225,7 +225,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (!cond)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -253,7 +253,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (!cond[1].value[3])>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -283,7 +283,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond == 5)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -316,7 +316,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond != 5)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -337,7 +337,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond < 5)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -358,7 +358,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond <= 5)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -379,7 +379,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond > 5)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -400,7 +400,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader("<:def function(arg1)>\n<:if (cond >= 5)>\ndo something\n</:if>\n</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -421,7 +421,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader(@"<:def function(arg1)><:if (cond != ""str ing"")>do something</:if></:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -452,7 +452,7 @@ namespace TKOM.Test.Tools
             var reader = new StringsReader(@"<:def function(arg1)><:if (cond != nested[0].val)>do something</:if></:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -492,7 +492,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -519,7 +519,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -545,7 +545,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -574,7 +574,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -600,7 +600,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -628,7 +628,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -656,7 +656,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -683,7 +683,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -712,7 +712,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -741,7 +741,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -764,7 +764,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -789,7 +789,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -814,7 +814,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -846,7 +846,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -873,7 +873,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -901,7 +901,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -929,7 +929,7 @@ namespace TKOM.Test.Tools
                                             "</:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -964,7 +964,7 @@ namespace TKOM.Test.Tools
                                             "   <:def function_two()><br/></:def>");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -999,7 +999,7 @@ namespace TKOM.Test.Tools
                                             "</:def>\n\n");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -1037,7 +1037,7 @@ namespace TKOM.Test.Tools
                                             "</:def>\n\n");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -1060,7 +1060,7 @@ namespace TKOM.Test.Tools
                                             "</:def>\n\n");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -1081,7 +1081,7 @@ namespace TKOM.Test.Tools
                                             "</:def>\n\n");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();
@@ -1103,7 +1103,7 @@ namespace TKOM.Test.Tools
                                             "</:def>\n\n");
             var scanner = new Scanner(reader);
             var logger = new Mock<ILogger<Parser>>();
-            var parser = new Parser(scanner, logger.Object);
+            var parser = new Parser(scanner);
 
             // act 
             var tree = parser.Parse();

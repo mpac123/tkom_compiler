@@ -16,10 +16,15 @@ namespace TKOM.Tools
             _reader = reader;
         }
         public Token Token { private set; get; }
+        private int line = 1;
+        private int column = 1;
 
         public void ReadNextToken()
         {
             SkipWhitespaces();
+
+            line = _reader.Line;
+            column = _reader.Column;
 
             if (TryReadEof())
             {
@@ -35,7 +40,7 @@ namespace TKOM.Tools
                 return;
             }
 
-            Token = new Token(TokenType.Invalid);
+            Token = new Token(TokenType.Invalid, line, column);
         }
 
         public bool TryReadText()
@@ -51,7 +56,7 @@ namespace TKOM.Tools
             if (buffer.Length > 0)
             {
 
-                Token = new Token(TokenType.Text, buffer.ToString());
+                Token = new Token(TokenType.Text, buffer.ToString(), line, column);
                 return true;
             }
             return false;
@@ -68,7 +73,7 @@ namespace TKOM.Tools
             }
             if (buffer.Length > 0)
             {
-                Token = new Token(TokenType.Text, buffer.ToString());
+                Token = new Token(TokenType.Text, buffer.ToString(), line, column);
                 return true;
             }
             return false;
@@ -145,7 +150,7 @@ namespace TKOM.Tools
                 }
                 else
                 {
-                    Token = new Token(possibleTokens.First().tokenType);
+                    Token = new Token(possibleTokens.First().tokenType, line, column);
                     _reader.Read();
                     return true;
                 }
@@ -161,13 +166,13 @@ namespace TKOM.Tools
                 _reader.Read();
                 if (possibleFollowingSignsDict.dictionary == null)
                 {
-                    Token = new Token(possibleFollowingSignsDict.tokenType.Value);
+                    Token = new Token(possibleFollowingSignsDict.tokenType.Value, line, column);
                     return true;
                 }
                 TokenType twoSignTokenType;
                 if (possibleFollowingSignsDict.dictionary.TryGetValue((char)_reader.CurrentSign, out twoSignTokenType))
                 {
-                    Token = new Token(twoSignTokenType);
+                    Token = new Token(twoSignTokenType, line, column);
                     _reader.Read();
                     return true;
                 }
@@ -175,7 +180,7 @@ namespace TKOM.Tools
                 {
                     if (possibleFollowingSignsDict.tokenType != null)
                     {
-                        Token = new Token(possibleFollowingSignsDict.tokenType.Value);
+                        Token = new Token(possibleFollowingSignsDict.tokenType.Value, line, column);
                         return true;
                     }
                     else
@@ -203,7 +208,7 @@ namespace TKOM.Tools
                     || _reader.CurrentSign == ')' || _reader.CurrentSign == ']'
                     || _reader.CurrentSign == ',')
                 {
-                    Token = new Token(TokenType.Number, buffer.ToString());
+                    Token = new Token(TokenType.Number, buffer.ToString(), line, column);
                     return true;
                 }
                 else
@@ -235,7 +240,7 @@ namespace TKOM.Tools
                     || _reader.CurrentSign == '\r' || _reader.CurrentSign == '>'
                     || _reader.CurrentSign == '/' || _reader.CurrentSign == '=')
                 {
-                    Token = new Token(TokenType.Identifier, buffer.ToString());
+                    Token = new Token(TokenType.Identifier, buffer.ToString(), line, column);
                     return true;
                 }
                 else
@@ -253,7 +258,7 @@ namespace TKOM.Tools
         {
             if (_reader.CurrentSign == -1)
             {
-                Token = new Token(TokenType.Eof);
+                Token = new Token(TokenType.Eof, line, column);
                 return true;
             }
             return false;

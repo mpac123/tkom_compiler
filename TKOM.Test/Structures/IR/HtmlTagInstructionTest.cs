@@ -36,7 +36,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div style=\"{color: \"blue\"}\"></div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div style=\"{color: \"blue\"}\"></div>", streamReader.ReadToEnd());
 
         }
 
@@ -82,7 +82,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div style=\"{color: \"blue\"}\">val2</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div style=\"{color: \"blue\"}\">val2</div>", streamReader.ReadToEnd());
 
         }
 
@@ -109,7 +109,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div>literal</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div>literal</div>", streamReader.ReadToEnd());
 
         }
 
@@ -140,7 +140,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div>\n  literal\n  <br/>\n</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div>\n  literal\n  <br/>\n</div>", streamReader.ReadToEnd());
 
         }
 
@@ -195,7 +195,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div>\n  literal nested literal\n</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div>\n  literal nested literal\n</div>", streamReader.ReadToEnd());
 
         }
 
@@ -251,7 +251,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div>\n  literal\n</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div>\n  literal\n</div>", streamReader.ReadToEnd());
 
         }
 
@@ -306,7 +306,7 @@ namespace TKOM.Test.Structures.IR
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("<div>\n  literal\n  <br/>\n</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div>\n  literal\n  <br/>\n</div>", streamReader.ReadToEnd());
 
         }
     }
