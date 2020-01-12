@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Moq;
+using Newtonsoft.Json.Linq;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
 using Xunit;
@@ -16,7 +17,7 @@ namespace TKOM.Test.Structures.IR
             var outer_scope = new Scope {
                 Variables = new HashSet<string> {"model"},
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,5,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
             var forInstruction = new ForInstruction(outer_scope, new ForExpression {
@@ -55,7 +56,7 @@ namespace TKOM.Test.Structures.IR
             var outer_scope = new Scope {
                 Variables = new HashSet<string> {"model"},
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[{'prop': 2},{'prop': 5},{'prop':8}],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[{'prop': 2},{'prop': 5},{'prop':8}],'field2':'val2'}"))}
                 }
             };
             var forInstruction = new ForInstruction(outer_scope, new ForExpression {

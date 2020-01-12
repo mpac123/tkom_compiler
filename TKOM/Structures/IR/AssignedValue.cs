@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 namespace TKOM.Structures.IR
 {
     public class AssignedValue
@@ -6,12 +8,12 @@ namespace TKOM.Structures.IR
         {
 
         }
-        public AssignedValue(string stringValue)
+        public AssignedValue(JToken jValue)
         {
-            StringValue = stringValue;
+            StringValue = jValue;
         }
         public bool IsNumericValue { set; get; }
-        public string StringValue { set; get; }
+        public JToken StringValue { set; get; }
         public double NumericValue { set; get; }
     }
 }

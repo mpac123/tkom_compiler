@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TKOM.Structures.IR;
 using TKOM.Utils;
 using static TKOM.Utils.Token;
 
@@ -8,6 +9,7 @@ namespace TKOM.Structures.AST
     {
 
         ValueOf LeftHandSideVariable { set; get; }
+        public bool EvaluateCondition(Scope scope);
 
     }
 

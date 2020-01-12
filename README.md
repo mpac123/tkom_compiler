@@ -72,7 +72,7 @@ Template in my language (*.mpgl):
 ```
 
 ## Available instructions
- - `<:def function(args)> body </:def>: declare a function. There must be at least one function declares, it must be called `main` and have exactly one argument, which will be initialised with the model
+ - `<:def function(args)> body </:def>`: declare a function. There must be at least one function declares, it must be called `main` and have exactly one argument, which will be initialised with the model
  - `{model.property[index].value}`: returns the value of variable
  - `{function(arg1, arg2)`: calls function and returns its value
  - `<:for value in model.array> content using {value} </:for>`: iterates over an array

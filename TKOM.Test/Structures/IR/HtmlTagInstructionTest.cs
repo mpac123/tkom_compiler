@@ -3,6 +3,7 @@ using System.IO;
 using Moq;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace TKOM.Test.Structures.IR
@@ -48,7 +49,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,5,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
             var htmlInstruction = new HtmlTagInstruction(outer_scope, new HtmlTag
@@ -152,7 +153,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,5,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
 
@@ -207,7 +208,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,5,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
 
@@ -263,7 +264,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,5,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
 

@@ -30,11 +30,6 @@ namespace TKOM.Structures.IR
             }
         }
 
-        // public void AddInstructionToBlock(Executable executable)
-        // {
-
-        // }
-
         public void Initialize(List<AssignedValue> arguments)
         {
             Scope.VariableValues = new Dictionary<string, AssignedValue>();

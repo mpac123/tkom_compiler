@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
 using Xunit;
@@ -15,7 +16,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model " },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'val1': 'aaa', 'val2:': 'bbb'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'val1': 'aaa', 'val2:': 'bbb'}"))}
                 }
             };
 
@@ -46,7 +47,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model " },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'val1': 'aaa', 'val2': 'bbb'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'val1': 'aaa', 'val2': 'bbb'}"))}
                 }
             };
 
@@ -90,7 +91,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model " },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("\"black\"")}
+                    {"model", new AssignedValue(JToken.Parse("\"black\""))}
                 }
             };
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Moq;
+using Newtonsoft.Json.Linq;
 using TKOM.Exceptions;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
@@ -18,7 +19,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,5,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{\"field1\":[2,5,8],\"field2\":\"val2\"}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -61,7 +62,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'val2'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'val2'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -105,7 +106,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'true'}")}
+                    {"model", new AssignedValue(JToken.Parse("{\"field1\":[2,0,8],\"field2\":\"true\"}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -148,7 +149,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'False'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'False'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -191,7 +192,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -244,7 +245,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'different_literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'different_literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -297,7 +298,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -350,7 +351,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'different_literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'different_literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -403,7 +404,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -454,7 +455,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -504,7 +505,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -554,7 +555,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8.256],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8.256],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -604,7 +605,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -654,7 +655,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -704,7 +705,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -754,7 +755,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -804,7 +805,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -860,7 +861,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal', 'field3': 'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal', 'field3': 'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -913,7 +914,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal', 'field3': 'different_literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal', 'field3': 'different_literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -966,7 +967,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal', 'field3': 'different_literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal', 'field3': 'different_literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -1019,7 +1020,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal', 'field3': 'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal', 'field3': 'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -1072,7 +1073,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal', 'field3': 'literal'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal', 'field3': 'literal'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -1135,7 +1136,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'literal', 'field3': '5.0'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'literal', 'field3': '5.0'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression
@@ -1198,7 +1199,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    {"model", new AssignedValue("{'field1':[2,0,8],'field2':'5', 'field3': '5.0'}")}
+                    {"model", new AssignedValue(JToken.Parse("{'field1':[2,0,8],'field2':'5', 'field3': '5.0'}"))}
                 }
             };
             var ifInstruction = new IfInstruction(outer_scope, new IfExpression

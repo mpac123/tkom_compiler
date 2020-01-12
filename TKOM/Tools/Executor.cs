@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 using TKOM.Structures.IR;
 
 namespace TKOM.Tools
@@ -13,7 +14,7 @@ namespace TKOM.Tools
             _functions_dict = dict;
         }
 
-        public void Execute(string model, string path_out, bool addDeclaration)
+        public void Execute(JToken model, string path_out, bool addDeclaration)
         {
             var main_fun = _functions_dict["main"];
             main_fun.Initialize(new List<AssignedValue> {

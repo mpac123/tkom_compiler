@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
+using Newtonsoft.Json.Linq;
 using TKOM.Exceptions;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
@@ -24,7 +25,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    { "model", new AssignedValue("['value1', 'value2']") }
+                    { "model", new AssignedValue(JToken.Parse("['value1', 'value2']")) }
                 }
             }, new FunctionCall
             {
@@ -43,7 +44,7 @@ namespace TKOM.Test.Structures.IR
 
             // validate
             Assert.Single(functionBlock.Scope.VariableValues);
-            Assert.Equal("\"value2\"", functionBlock.Scope.VariableValues["arg1"].StringValue);
+            Assert.Equal(JToken.Parse("\"value2\""), functionBlock.Scope.VariableValues["arg1"].StringValue);
         }
 
         [Fact]
@@ -59,7 +60,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    { "model", new AssignedValue("['value1', 'value2']") }
+                    { "model", new AssignedValue(JToken.Parse("['value1', 'value2']")) }
                 }
             }, new FunctionCall
             {
@@ -94,7 +95,8 @@ namespace TKOM.Test.Structures.IR
             // prepare
             var variables = new List<string> { "arg1" };
             var functionBlock = new Block(null, variables, "fun");
-            functionBlock.NestedBlocks.Add(new ValueOfInstruction(functionBlock.Scope, new ValueOf {
+            functionBlock.NestedBlocks.Add(new ValueOfInstruction(functionBlock.Scope, new ValueOf
+            {
                 VariableName = "arg1"
             }));
             var functionDictionary = new Dictionary<string, Block> {
@@ -104,7 +106,7 @@ namespace TKOM.Test.Structures.IR
             {
                 Variables = new HashSet<string> { "model" },
                 VariableValues = new Dictionary<string, AssignedValue> {
-                    { "model", new AssignedValue("['value1', 'value2']") }
+                    { "model", new AssignedValue(JToken.Parse("['value1', 'value2']")) }
                 }
             }, new FunctionCall
             {
@@ -118,12 +120,56 @@ namespace TKOM.Test.Structures.IR
             });
 
             // act
+            var memoryStream = new MemoryStream();
+            var streamWriter = new StreamWriter(memoryStream);
+            functionCallInstruction.Execute(streamWriter, functionDictionary, 0, false);
+            streamWriter.Flush();
+
+            // validate
+            memoryStream.Position = 0;
+            var streamReader = new StreamReader(memoryStream);
+            Assert.Single(functionBlock.Scope.VariableValues);
+            Assert.Equal(JToken.Parse("\"value2\""), functionBlock.Scope.VariableValues["arg1"].StringValue);
+            Assert.Equal("\nvalue2", streamReader.ReadToEnd());
+        }
+
+
+        [Fact]
+        public void DefinedFunctionWithValueOfCallWithSimpleValue_CallFunctionWithArguments_ScopeInitializedCorrectly()
+        {
+            // prepare
+            var variables = new List<string> { "arg1" };
+            var functionBlock = new Block(null, variables, "fun");
+            functionBlock.NestedBlocks.Add(new ValueOfInstruction(functionBlock.Scope, new ValueOf
+            {
+                VariableName = "arg1"
+            }));
+            var functionDictionary = new Dictionary<string, Block> {
+                {"function", functionBlock}
+            };
+            var functionCallInstruction = new FunctionCallInstruction(new Scope
+            {
+                Variables = new HashSet<string> { "model" },
+                VariableValues = new Dictionary<string, AssignedValue> {
+                    { "model", new AssignedValue(JToken.Parse("'value2'")) }
+                }
+            }, new FunctionCall
+            {
+                FunctionName = "function",
+                ArgumentValues = new List<Value> {
+                    new ValueOf {
+                        VariableName = "model"
+                    }
+                }
+            });
+
+            // act
             var streamWriter = new Mock<StreamWriter>(new MemoryStream());
             functionCallInstruction.Execute(streamWriter.Object, functionDictionary, 0, false);
 
             // validate
             Assert.Single(functionBlock.Scope.VariableValues);
-            Assert.Equal("\"value2\"", functionBlock.Scope.VariableValues["arg1"].StringValue);
+            Assert.Equal(JToken.Parse("\"value2\""), functionBlock.Scope.VariableValues["arg1"].StringValue);
             streamWriter.Verify(s => s.Write("value2"), Times.Once);
         }
     }

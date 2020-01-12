@@ -24,7 +24,7 @@ namespace TKOM.Structures.IR
             int nestedLevel, bool newLine)
         {
             base.Execute(streamWriter, functions, nestedLevel, newLine);
-            streamWriter.Write(ReturnValue().ToString());
+            streamWriter.Write(ReturnValue().ToObject<string>());
         }
 
         public JToken ReturnValue()
@@ -41,7 +41,7 @@ namespace TKOM.Structures.IR
             }
             var currentValueOf = ValueOf;
             var alreadyParsedBuilder = new StringBuilder(rootName);
-            JToken jToken = JToken.Parse(rootValue.StringValue);
+            JToken jToken = rootValue.StringValue;
             do
             {
                 if (currentValueOf.Index != null)

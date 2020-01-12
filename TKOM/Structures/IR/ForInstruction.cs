@@ -33,7 +33,7 @@ namespace TKOM.Structures.IR
                 // });
 
                 Block.Initialize(new List<AssignedValue> {
-                        new AssignedValue(element.ToString())
+                        new AssignedValue(element)
                 });
                 Block.Execute(streamWriter, functions, nestedLevel, true);
             }

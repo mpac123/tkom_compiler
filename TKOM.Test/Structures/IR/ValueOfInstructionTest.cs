@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using TKOM.Exceptions;
 using TKOM.Structures.AST;
 using TKOM.Structures.IR;
@@ -16,7 +17,7 @@ namespace TKOM.Test.Structures.IR
             {
                 UpperScope = null,
                 Variables = new HashSet<string> { "arg" },
-                VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue("'value'") } }
+                VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue(JToken.Parse("'value'")) } }
             };
             var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
             {
@@ -38,7 +39,7 @@ namespace TKOM.Test.Structures.IR
             {
                 UpperScope = null,
                 Variables = new HashSet<string> { "array" },
-                VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue("[1,3,6]") } }
+                VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue(JToken.Parse("[1,3,6]")) } }
             };
             var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
             {
@@ -61,7 +62,7 @@ namespace TKOM.Test.Structures.IR
             {
                 UpperScope = null,
                 Variables = new HashSet<string> { "array" },
-                VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue("{'object': [1,3,6]}") } }
+                VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue(JToken.Parse("{'object': [1,3,6]}")) } }
             };
             var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
             {
@@ -88,7 +89,7 @@ namespace TKOM.Test.Structures.IR
             {
                 UpperScope = null,
                 Variables = new HashSet<string> { "array" },
-                VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue("{'object': [{'el':1,'n':1},{'el':2,'n':2}]}") } }
+                VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue(JToken.Parse("{'object': [{'el':1,'n':1},{'el':2,'n':2}]}")) } }
             };
             var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
             {
@@ -120,10 +121,10 @@ namespace TKOM.Test.Structures.IR
                 UpperScope = new Scope
                 {
                     Variables = new HashSet<string> { "arg" },
-                    VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue("'value'") } }
+                    VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue(JToken.Parse("'value'")) } }
                 },
                 Variables = new HashSet<string> { "arg2" },
-                VariableValues = new Dictionary<string, AssignedValue> { { "arg2", new AssignedValue("'value2'") } }
+                VariableValues = new Dictionary<string, AssignedValue> { { "arg2", new AssignedValue(JToken.Parse("'value2'")) } }
             };
             var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
             {
@@ -146,10 +147,10 @@ namespace TKOM.Test.Structures.IR
                 UpperScope = new Scope
                 {
                     Variables = new HashSet<string> { "arg" },
-                    VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue("'value'") } }
+                    VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue(JToken.Parse("'value'")) } }
                 },
                 Variables = new HashSet<string> { "arg2" },
-                VariableValues = new Dictionary<string, AssignedValue> { { "arg2", new AssignedValue("'value2'") } }
+                VariableValues = new Dictionary<string, AssignedValue> { { "arg2", new AssignedValue(JToken.Parse("'value2'")) } }
             };
             var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
             {

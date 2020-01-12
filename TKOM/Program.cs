@@ -2,6 +2,7 @@
 using System.IO;
 using CommandLine;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using TKOM.Exceptions;
 using TKOM.Readers;
 using TKOM.Tools;
@@ -56,7 +57,7 @@ namespace TKOM
                     outputPath = opts.OutputPath;
 
 
-                    Execute(model, templatePath, outputPath, opts.AddDeclaration);
+                    Execute(new JValue(model), templatePath, outputPath, opts.AddDeclaration);
                 });
 
 
@@ -69,7 +70,7 @@ namespace TKOM
             // Console.WriteLine(deserialized.Count());
         }
 
-        private static void Execute(string model, string templatePath, string outputPath, bool addDeclaration)
+        private static void Execute(JValue model, string templatePath, string outputPath, bool addDeclaration)
         {
             var loggerFactory = LoggerFactory.Create(builder =>
             {
