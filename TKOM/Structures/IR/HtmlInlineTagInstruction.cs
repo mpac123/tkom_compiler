@@ -6,7 +6,7 @@ namespace TKOM.Structures.IR
 {
     public class HtmlInlineTagInstruction : Instruction
     {
-        public HtmlInlineTagInstruction(Scope scope, HtmlInlineTag htmlInlineTag) : base(scope)
+        public HtmlInlineTagInstruction(ScopePrototype scopePrototype, HtmlInlineTag htmlInlineTag) : base(scopePrototype)
         {
             HtmlInlineTag = htmlInlineTag;
         }
@@ -14,15 +14,16 @@ namespace TKOM.Structures.IR
         public HtmlInlineTag HtmlInlineTag { private set; get; }
 
 
-        public override void Execute(StreamWriter streamWriter, Dictionary<string, Block> functions, int nestedLevel, bool newLine)
+        public override void Execute(Node node)
         {
-            base.Execute(streamWriter, functions, nestedLevel, true);
-            streamWriter.Write($"<{HtmlInlineTag.TagName}");
+            node.NewLine = true;
+            base.Execute(node);
+            node.StreamWriter.Write($"<{HtmlInlineTag.TagName}");
             foreach (var attribute in HtmlInlineTag.Attributes)
             {
-                streamWriter.Write($" {attribute.attributeName}=\"{attribute.attributeValue}\"");
+                node.StreamWriter.Write($" {attribute.attributeName}=\"{attribute.attributeValue}\"");
             }
-            streamWriter.Write($"/>");
+            node.StreamWriter.Write($"/>");
         }
 
     }

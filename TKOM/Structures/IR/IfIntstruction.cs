@@ -11,7 +11,7 @@ namespace TKOM.Structures.IR
 {
     public class IfInstruction : Instruction
     {
-        public IfInstruction(Scope scope, IfExpression ifExpression) : base(scope)
+        public IfInstruction(ScopePrototype scopePrototype, IfExpression ifExpression) : base(scopePrototype)
         {
             IfExpression = ifExpression;
             IfBlock = new List<Executable>();
@@ -24,33 +24,31 @@ namespace TKOM.Structures.IR
         public List<Executable> ElseBlock { set; get; }
 
 
-        public override void Execute(StreamWriter streamWriter,
-            Dictionary<string, Block> functions,
-            int nestedLevel, bool newLine)
+        public override void Execute(Node node)
         {
-            if (IsComparisonTrue())
+            if (IsComparisonTrue(node.Scope))
             {
                 foreach (var instrucion in IfBlock)
                 {
-                    instrucion.Execute(streamWriter, functions, nestedLevel, false);
+                    instrucion.Execute(node);
                 }
             }
             else
             {
                 foreach (var instrucion in ElseBlock)
                 {
-                    instrucion.Execute(streamWriter, functions, nestedLevel, false);
+                    instrucion.Execute(node);
                 }
             }
         }
 
-        private bool IsComparisonTrue()
+        private bool IsComparisonTrue(Scope scope)
         {
                 if (IfExpression.Negated)
                 {
-                    return !IfExpression.Condition.EvaluateCondition(Scope);
+                    return !IfExpression.Condition.EvaluateCondition(scope);
                 }
-                return IfExpression.Condition.EvaluateCondition(Scope);
+                return IfExpression.Condition.EvaluateCondition(scope);
         }
         
     }

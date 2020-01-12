@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TKOM.Structures.IR;
 using static TKOM.Utils.Token;
 
 namespace TKOM.Structures.AST

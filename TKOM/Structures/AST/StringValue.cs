@@ -17,7 +17,7 @@ namespace TKOM.Structures.AST
 
         public override AssignedValue GetIRValue(Scope scope)
         {
-            return new AssignedValue(JsonConvert.SerializeObject(StringValueBuilder.Build(this, scope)));
+            return new AssignedValue(StringValueBuilder.Build(this, scope));
         }
 
         public override bool PerformComparisonOnRhs(JToken lhsToken, ConditionType conditionType, Scope scope)

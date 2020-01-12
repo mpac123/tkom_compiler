@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TKOM.Exceptions;
@@ -12,16 +13,34 @@ namespace TKOM.Structures.AST
         public int? Index { set; get; }
         public ValueOf NestedValue { set; get; }
 
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder(VariableName);
+            var currentValueOf = this;
+            do
+            {
+                if (currentValueOf.Index != null)
+                {
+                    stringBuilder.Append($"[{currentValueOf.Index}]");
+                }
+                currentValueOf = currentValueOf.NestedValue;
+                if (currentValueOf != null)
+                {
+                    stringBuilder.Append($".{currentValueOf.VariableName}");
+                }
+            }
+            while (currentValueOf != null);
+            return stringBuilder.ToString();
+        }
+
         public override AssignedValue GetIRValue(Scope scope)
         {
-            var valueOfInstruction = new ValueOfInstruction(scope, this);
-            return new AssignedValue(valueOfInstruction.ReturnValue());
+            return new AssignedValue(scope.FindValueOfValueOf(this));
         }
 
         public override bool PerformComparisonOnRhs(JToken lhsToken, ConditionType conditionType, Scope scope)
         {
-            var rhsInstruction = new ValueOfInstruction(scope, this);
-            var rhsToken = rhsInstruction.ReturnValue();
+            var rhsToken = scope.FindValueOfValueOf(this);
             switch (conditionType)
             {
                 case ConditionType.Equal:
@@ -88,6 +107,11 @@ namespace TKOM.Structures.AST
                 default:
                     throw new RuntimeException($"Unknown condition type: {conditionType.ToString()}");
             }
+        }
+
+        public string GetValue(Scope scope)
+        {
+            return scope.FindValueOfValueOf(this).ToString();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace TKOM.Structures.IR
 {
     public class FunctionCallInstruction : Instruction
     {
-        public FunctionCallInstruction(Scope scope, FunctionCall functionCall) : base(scope)
+        public FunctionCallInstruction(ScopePrototype scopePrototype, FunctionCall functionCall) : base(scopePrototype)
         {
             FunctionCall = functionCall;
         }
@@ -17,18 +17,18 @@ namespace TKOM.Structures.IR
         FunctionCall FunctionCall { set; get; }
 
 
-        public override void Execute(StreamWriter streamWriter,
-            Dictionary<string, Block> functions,
-            int nestedLevel, bool newLine)
+        public override void Execute(Node node)
         {
-            var functionBlock = functions[FunctionCall.FunctionName];
+            var functionBlock = node.FunctionsDict[FunctionCall.FunctionName];
             var assignedValues = new List<AssignedValue>();
             foreach (var argumentCall in FunctionCall.ArgumentValues)
             {
-                assignedValues.Add(argumentCall.GetIRValue(Scope));
+                assignedValues.Add(argumentCall.GetIRValue(node.Scope));
             }
-            functionBlock.Initialize(assignedValues);
-            functionBlock.Execute(streamWriter, functions, nestedLevel, newLine);
+            var newNode = new Node(node, functionBlock.ScopePrototype, null);
+            newNode.Scope.Initialize(assignedValues);
+
+            functionBlock.Execute(newNode);
         }
 
     }

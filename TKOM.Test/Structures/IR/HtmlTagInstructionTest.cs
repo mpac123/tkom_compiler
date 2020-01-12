@@ -31,7 +31,13 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate
@@ -45,14 +51,17 @@ namespace TKOM.Test.Structures.IR
         public void DefinedHtmlTagWithNestedValue_Call_TagAndValuePrintedCorrectly()
         {
             // prepare
-            var outer_scope = new Scope
+            var outer_scope_prototype = new ScopePrototype
             {
                 Variables = new HashSet<string> { "model" },
+            };
+            var outer_scope = new Scope(outer_scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
-            var htmlInstruction = new HtmlTagInstruction(outer_scope, new HtmlTag
+            var htmlInstruction = new HtmlTagInstruction(outer_scope_prototype, new HtmlTag
             {
                 TagName = "div",
                 Attributes = new List<(string, StringValue)> {
@@ -65,7 +74,7 @@ namespace TKOM.Test.Structures.IR
                         })
                 }
             });
-            htmlInstruction.Block.Add(new ValueOfInstruction(outer_scope, new ValueOf
+            htmlInstruction.Block.Add(new StringComponentInstruction(outer_scope_prototype, new ValueOf
             {
                 VariableName = "model",
                 NestedValue = new ValueOf
@@ -77,7 +86,14 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0,
+                Scope = outer_scope,
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate
@@ -96,7 +112,7 @@ namespace TKOM.Test.Structures.IR
             {
                 TagName = "div",
             });
-            htmlInstruction.Block.Add(new LiteralInstruction(htmlInstruction.Scope, new Literal
+            htmlInstruction.Block.Add(new StringComponentInstruction(htmlInstruction.ScopePrototype, new Literal
             {
                 Content = "literal"
             }));
@@ -104,7 +120,13 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate
@@ -123,11 +145,11 @@ namespace TKOM.Test.Structures.IR
             {
                 TagName = "div",
             });
-            htmlInstruction.Block.Add(new LiteralInstruction(htmlInstruction.Scope, new Literal
+            htmlInstruction.Block.Add(new StringComponentInstruction(htmlInstruction.ScopePrototype, new Literal
             {
                 Content = "literal"
             }));
-            htmlInstruction.Block.Add(new HtmlInlineTagInstruction(htmlInstruction.Scope, new HtmlInlineTag
+            htmlInstruction.Block.Add(new HtmlInlineTagInstruction(htmlInstruction.ScopePrototype, new HtmlInlineTag
             {
                 TagName = "br"
             }));
@@ -135,7 +157,13 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate
@@ -149,23 +177,26 @@ namespace TKOM.Test.Structures.IR
         public void HtmlTagWithLiteralAndNestedIfInside_Execute_NestedTagAndLiteralInSeperateLines()
         {
             // prepare
-            var outer_scope = new Scope
+            var outer_scope_prototype = new ScopePrototype
             {
                 Variables = new HashSet<string> { "model" },
+            };
+            var outer_scope = new Scope(outer_scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
 
-            var htmlInstruction = new HtmlTagInstruction(outer_scope, new HtmlTag
+            var htmlInstruction = new HtmlTagInstruction(outer_scope_prototype, new HtmlTag
             {
                 TagName = "div",
             });
-            htmlInstruction.Block.Add(new LiteralInstruction(htmlInstruction.Scope, new Literal
+            htmlInstruction.Block.Add(new StringComponentInstruction(htmlInstruction.ScopePrototype, new Literal
             {
                 Content = "literal"
             }));
-            var ifInstruction = new IfInstruction(htmlInstruction.Scope, new IfExpression
+            var ifInstruction = new IfInstruction(htmlInstruction.ScopePrototype, new IfExpression
             {
                 Condition = new SimpleCondition
                 {
@@ -181,8 +212,8 @@ namespace TKOM.Test.Structures.IR
                 }
             });
             ifInstruction.IfBlock = new List<Executable> {
-                new LiteralInstruction(ifInstruction.Scope, new Literal {
-                    Content = " nested literal"
+                new StringComponentInstruction(ifInstruction.ScopePrototype, new Literal {
+                    Content = "nested literal"
                 })
             };
             htmlInstruction.Block.Add(ifInstruction);
@@ -190,13 +221,20 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0,
+                Scope = outer_scope
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate
             memoryStream.Position = 0;
             var streamReader = new StreamReader(memoryStream);
-            Assert.Equal("\n<div>\n  literal nested literal\n</div>", streamReader.ReadToEnd());
+            Assert.Equal("\n<div>\n  literal\n  nested literal\n</div>", streamReader.ReadToEnd());
 
         }
 
@@ -204,23 +242,26 @@ namespace TKOM.Test.Structures.IR
         public void HtmlTagWithLiteralAndNestedNegatedIfInside_Execute_LiteralInSeperateLine()
         {
             // prepare
-            var outer_scope = new Scope
+            var outer_scope_prototype = new ScopePrototype
             {
-                Variables = new HashSet<string> { "model" },
+                Variables = new HashSet<string> { "model" }
+            };
+            var outer_scope = new Scope(outer_scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
 
-            var htmlInstruction = new HtmlTagInstruction(outer_scope, new HtmlTag
+            var htmlInstruction = new HtmlTagInstruction(outer_scope_prototype, new HtmlTag
             {
                 TagName = "div",
             });
-            htmlInstruction.Block.Add(new LiteralInstruction(htmlInstruction.Scope, new Literal
+            htmlInstruction.Block.Add(new StringComponentInstruction(htmlInstruction.ScopePrototype, new Literal
             {
                 Content = "literal"
             }));
-            var ifInstruction = new IfInstruction(htmlInstruction.Scope, new IfExpression
+            var ifInstruction = new IfInstruction(htmlInstruction.ScopePrototype, new IfExpression
             {
                 Condition = new SimpleCondition
                 {
@@ -237,7 +278,7 @@ namespace TKOM.Test.Structures.IR
                 Negated = true
             });
             ifInstruction.IfBlock = new List<Executable> {
-                new LiteralInstruction(ifInstruction.Scope, new Literal {
+                new StringComponentInstruction(ifInstruction.ScopePrototype, new Literal {
                     Content = " nested literal"
                 })
             };
@@ -246,7 +287,14 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0,
+                Scope = outer_scope
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate
@@ -260,23 +308,26 @@ namespace TKOM.Test.Structures.IR
         public void HtmlTagWithLiteralAndNestedIfWithHtmlTagInside_Execute_NestedTagAndLiteralInSeperateLines()
         {
             // prepare
-            var outer_scope = new Scope
+            var outer_scope_prototype = new ScopePrototype
             {
                 Variables = new HashSet<string> { "model" },
+            };
+            var outer_scope = new Scope(outer_scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("{'field1':[2,5,8],'field2':'val2'}"))}
                 }
             };
 
-            var htmlInstruction = new HtmlTagInstruction(outer_scope, new HtmlTag
+            var htmlInstruction = new HtmlTagInstruction(outer_scope_prototype, new HtmlTag
             {
                 TagName = "div",
             });
-            htmlInstruction.Block.Add(new LiteralInstruction(htmlInstruction.Scope, new Literal
+            htmlInstruction.Block.Add(new StringComponentInstruction(htmlInstruction.ScopePrototype, new Literal
             {
                 Content = "literal"
             }));
-            var ifInstruction = new IfInstruction(htmlInstruction.Scope, new IfExpression
+            var ifInstruction = new IfInstruction(htmlInstruction.ScopePrototype, new IfExpression
             {
                 Condition = new SimpleCondition
                 {
@@ -292,7 +343,7 @@ namespace TKOM.Test.Structures.IR
                 }
             });
             ifInstruction.IfBlock = new List<Executable> {
-                new HtmlInlineTagInstruction(ifInstruction.Scope, new HtmlInlineTag {
+                new HtmlInlineTagInstruction(ifInstruction.ScopePrototype, new HtmlInlineTag {
                     TagName = "br"
                 })
             };
@@ -301,7 +352,14 @@ namespace TKOM.Test.Structures.IR
             // act
             var memoryStream = new MemoryStream();
             var streamWriter = new StreamWriter(memoryStream);
-            htmlInstruction.Execute(streamWriter, null, 0, false);
+            var node = new Node
+            {
+                StreamWriter = streamWriter,
+                NewLine = false,
+                NestedLevel = 0,
+                Scope = outer_scope
+            };
+            htmlInstruction.Execute(node);
             streamWriter.Flush();
 
             // validate

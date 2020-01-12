@@ -52,7 +52,7 @@ namespace TKOM.Tools
             }
 
             // check if function main has been defined with exactly one parameter
-            if (main_block.Scope.Variables.Count() != 1)
+            if (main_block.ScopePrototype.Variables.Count() != 1)
             {
                 throw new SemanticsException("Function main must be defined with exactly one parameter");
             }
@@ -64,11 +64,11 @@ namespace TKOM.Tools
             {
                 Block functionBlock;
                 _functions.TryGetValue(function.Identifier, out functionBlock);
-                PopulateInstructions(function.Instructions, functionBlock.NestedBlocks, functionBlock.Scope);
+                PopulateInstructions(function.Instructions, functionBlock.NestedBlocks, functionBlock.ScopePrototype);
             }
         }
 
-        private void PopulateInstructions(List<IInstruction> instructions, List<Executable> block, Scope scope)
+        private void PopulateInstructions(List<IInstruction> instructions, List<Executable> block, ScopePrototype scope)
         {
             IfExpression encounteredIfExpression = null;
             foreach (var instruction in instructions)
@@ -130,7 +130,7 @@ namespace TKOM.Tools
             }
         }
 
-        private IfInstruction PopulateIfCondition(Scope scope, IfExpression ifExpression, ElseExpression elseExpression)
+        private IfInstruction PopulateIfCondition(ScopePrototype scope, IfExpression ifExpression, ElseExpression elseExpression)
         {
             var ifInstruction = new IfInstruction(scope, ifExpression);
             PopulateInstructions(ifExpression.Instructions, ifInstruction.IfBlock, scope);
@@ -141,7 +141,7 @@ namespace TKOM.Tools
             return ifInstruction;
         }
 
-        private ForInstruction PopulateForInstruction(Scope scope, ForExpression forExpression)
+        private ForInstruction PopulateForInstruction(ScopePrototype scope, ForExpression forExpression)
         {
             // check if the value to be iterated over exists in the scope
             if (!scope.Variables.Contains(forExpression.Collection.VariableName))
@@ -149,11 +149,11 @@ namespace TKOM.Tools
                 throw new SemanticsException($"Variable {forExpression.Collection.VariableName} has not been declared in the scope of operation for in function {scope.FunctionName}.");
             }
             var forInstruction = new ForInstruction(scope, forExpression);
-            PopulateInstructions(forExpression.Instructions, forInstruction.Block.NestedBlocks, forInstruction.Block.Scope);
+            PopulateInstructions(forExpression.Instructions, forInstruction.Block.NestedBlocks, forInstruction.Block.ScopePrototype);
             return forInstruction;
         }
 
-        private FunctionCallInstruction PopulateFunctionCallInstruction(Scope scope, FunctionCall functionCall)
+        private FunctionCallInstruction PopulateFunctionCallInstruction(ScopePrototype scope, FunctionCall functionCall)
         {
             // check if the function has been declared in the scope
             Block function_block;
@@ -179,26 +179,26 @@ namespace TKOM.Tools
 
         }
 
-        private HtmlInlineTagInstruction PopulateHtmlInlineTag(Scope scope, HtmlInlineTag htmlInlineTag)
+        private HtmlInlineTagInstruction PopulateHtmlInlineTag(ScopePrototype scope, HtmlInlineTag htmlInlineTag)
         {
             var htmlInlineInstruction = new HtmlInlineTagInstruction(scope, htmlInlineTag);
             return htmlInlineInstruction;
         }
 
-        private HtmlTagInstruction PopulateHtmlTag(Scope scope, HtmlTag htmlTag)
+        private HtmlTagInstruction PopulateHtmlTag(ScopePrototype scope, HtmlTag htmlTag)
         {
             var htmlTagInstruction = new HtmlTagInstruction(scope, htmlTag);
             PopulateInstructions(htmlTag.Instructions, htmlTagInstruction.Block, scope);
             return htmlTagInstruction;
         }
 
-        private LiteralInstruction PopulateLiteral(Scope scope, Literal literal)
+        private StringComponentInstruction PopulateLiteral(ScopePrototype scope, Literal literal)
         {
-            var literalInstruction = new LiteralInstruction(scope, literal);
+            var literalInstruction = new StringComponentInstruction(scope, literal);
             return literalInstruction;
         }
 
-        private ValueOfInstruction PopulateValueOf(Scope scope, ValueOf valueOf)
+        private StringComponentInstruction PopulateValueOf(ScopePrototype scope, ValueOf valueOf)
         {
             // check if value has been declared in the scope
             if (!scope.Variables.Contains(valueOf.VariableName))
@@ -206,7 +206,7 @@ namespace TKOM.Tools
                 throw new SemanticsException($"Variable {valueOf.VariableName} has not been declared in the scope of function {scope.FunctionName}.");
             }
 
-            var valueOfInstruction = new ValueOfInstruction(scope, valueOf);
+            var valueOfInstruction = new StringComponentInstruction(scope, valueOf);
             return valueOfInstruction;
         }
 

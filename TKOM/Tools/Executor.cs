@@ -17,16 +17,23 @@ namespace TKOM.Tools
         public void Execute(JToken model, string path_out, bool addDeclaration)
         {
             var main_fun = _functions_dict["main"];
-            main_fun.Initialize(new List<AssignedValue> {
-                new AssignedValue(model)
-            });
             using (var f = new StreamWriter(path_out))
             {
+                var node = new Node
+                {
+                    StreamWriter = f,
+                    NestedLevel = 0,
+                    NewLine = false,
+                    FunctionsDict = _functions_dict,
+                    Scope = new Scope(main_fun.ScopePrototype)
+                };
+                node.Scope.Initialize(new List<AssignedValue> {
+                new AssignedValue(model)});
                 if (addDeclaration)
                 {
                     f.Write("<!DOCTYPE html>\n<meta charset=\"UTF-8\">");
                 }
-                main_fun.Execute(f, _functions_dict, 0, false);
+                main_fun.Execute(node);
             }
         }
     }

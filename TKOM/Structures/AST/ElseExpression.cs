@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TKOM.Structures.IR;
 
 namespace TKOM.Structures.AST
 {
@@ -9,6 +10,5 @@ namespace TKOM.Structures.AST
         {
             Instructions = new List<IInstruction>();
         }
-
     }
 }

@@ -13,19 +13,21 @@ namespace TKOM.Test.Structures.IR
         public void ScopeWithVariable_VariableIsCalled_CorrectValueIsReturned()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
-                UpperScope = null,
                 Variables = new HashSet<string> { "arg" },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue(JToken.Parse("'value'")) } }
             };
-            var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
+            var valueOf = new ValueOf
             {
                 VariableName = "arg"
-            });
+            };
 
             // act 
-            var value = valueOfInstruction.ReturnValue();
+            var value = scope.FindValueOfValueOf(valueOf);
 
             // validate
             Assert.Equal("value", value);
@@ -35,20 +37,22 @@ namespace TKOM.Test.Structures.IR
         public void ScopeWithArray_VariableIsCalled_CorrectValueIsReturned()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
-                UpperScope = null,
                 Variables = new HashSet<string> { "array" },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue(JToken.Parse("[1,3,6]")) } }
             };
-            var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
+            var valueOf = new ValueOf
             {
                 VariableName = "array",
                 Index = 2
-            });
+            };
 
             // act 
-            var value = valueOfInstruction.ReturnValue();
+            var value = scope.FindValueOfValueOf(valueOf);
 
             // validate
             Assert.Equal("6", value);
@@ -58,13 +62,15 @@ namespace TKOM.Test.Structures.IR
         public void ScopeWithObjectWithArray_VariableIsCalled_CorrectValueIsReturned()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
-                UpperScope = null,
                 Variables = new HashSet<string> { "array" },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue(JToken.Parse("{'object': [1,3,6]}")) } }
             };
-            var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
+            var valueOf = new ValueOf
             {
                 VariableName = "array",
                 NestedValue = new ValueOf
@@ -72,10 +78,10 @@ namespace TKOM.Test.Structures.IR
                     VariableName = "object",
                     Index = 2
                 }
-            });
+            };
 
             // act 
-            var value = valueOfInstruction.ReturnValue();
+            var value = scope.FindValueOfValueOf(valueOf);
 
             // validate
             Assert.Equal("6", value);
@@ -85,13 +91,15 @@ namespace TKOM.Test.Structures.IR
         public void ScopeWithObjectWithArrayWithNestedObject_VariableIsCalled_CorrectValueIsReturned()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
-                UpperScope = null,
                 Variables = new HashSet<string> { "array" },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> { { "array", new AssignedValue(JToken.Parse("{'object': [{'el':1,'n':1},{'el':2,'n':2}]}")) } }
             };
-            var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
+            var valueOf = new ValueOf
             {
                 VariableName = "array",
                 NestedValue = new ValueOf
@@ -103,10 +111,10 @@ namespace TKOM.Test.Structures.IR
                         VariableName = "n"
                     }
                 }
-            });
+            };
 
             // act 
-            var value = valueOfInstruction.ReturnValue();
+            var value = scope.FindValueOfValueOf(valueOf);
 
             // validate
             Assert.Equal("2", value);
@@ -116,23 +124,30 @@ namespace TKOM.Test.Structures.IR
         public void ScopeWithVariableInUpperScope_VariableIsCalled_CorrectValueIsReturned()
         {
             // prepare
-            var scope = new Scope
+            var outer_scope_prototype = new ScopePrototype
             {
-                UpperScope = new Scope
+                Variables = new HashSet<string> { "arg" },
+            };
+            var scope_prototype = new ScopePrototype
+            {
+                Variables = new HashSet<string> { "arg2" },
+                UpperScopePrototype = outer_scope_prototype
+            };
+            var scope = new Scope(scope_prototype)
+            {
+                UpperScope = new Scope(outer_scope_prototype)
                 {
-                    Variables = new HashSet<string> { "arg" },
                     VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue(JToken.Parse("'value'")) } }
                 },
-                Variables = new HashSet<string> { "arg2" },
                 VariableValues = new Dictionary<string, AssignedValue> { { "arg2", new AssignedValue(JToken.Parse("'value2'")) } }
             };
-            var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
+            var valueOf =  new ValueOf
             {
                 VariableName = "arg"
-            });
+            };
 
             // act 
-            var value = valueOfInstruction.ReturnValue();
+            var value = scope.FindValueOfValueOf(valueOf);
 
             // validate
             Assert.Equal("value", value);
@@ -142,26 +157,33 @@ namespace TKOM.Test.Structures.IR
         public void ScopeWithoutVariable_VariableIsCalled_RuntimeExceptionIsThrown()
         {
             // prepare
-            var scope = new Scope
+            var outer_scope_prototype = new ScopePrototype
             {
-                UpperScope = new Scope
+                Variables = new HashSet<string> { "arg" },
+            };
+            var scope_prototype = new ScopePrototype
+            {
+                Variables = new HashSet<string> { "arg2" },
+                UpperScopePrototype = outer_scope_prototype
+            };
+            var scope = new Scope(scope_prototype)
+            {
+                UpperScope = new Scope(outer_scope_prototype)
                 {
-                    Variables = new HashSet<string> { "arg" },
                     VariableValues = new Dictionary<string, AssignedValue> { { "arg", new AssignedValue(JToken.Parse("'value'")) } }
                 },
-                Variables = new HashSet<string> { "arg2" },
                 VariableValues = new Dictionary<string, AssignedValue> { { "arg2", new AssignedValue(JToken.Parse("'value2'")) } }
             };
-            var valueOfInstruction = new ValueOfInstruction(scope, new ValueOf
+            var valueOf = new ValueOf
             {
                 VariableName = "arg3"
-            });
+            };
 
             // act 
             var exceptionWasThrown = false;
             try
             {
-                valueOfInstruction.ReturnValue();
+                scope.FindValueOfValueOf(valueOf);
             }
             catch (RuntimeException)
             {

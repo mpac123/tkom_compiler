@@ -12,9 +12,12 @@ namespace TKOM.Test.Structures.IR
         public void StringValueWithValueOf_BuildString_StringBuildCorrectly()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
                 Variables = new HashSet<string> { "model " },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("{'val1': 'aaa', 'val2:': 'bbb'}"))}
                 }
@@ -43,9 +46,12 @@ namespace TKOM.Test.Structures.IR
         public void StringValueWithValueOfAndStringsAlternating_BuildString_StringBuildCorrectly()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
                 Variables = new HashSet<string> { "model " },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("{'val1': 'aaa', 'val2': 'bbb'}"))}
                 }
@@ -87,9 +93,12 @@ namespace TKOM.Test.Structures.IR
         public void StringValueWithValueOfScopeWithStringOnly_BuildString_StringBuildCorrectly()
         {
             // prepare
-            var scope = new Scope
+            var scope_prototype = new ScopePrototype
             {
                 Variables = new HashSet<string> { "model " },
+            };
+            var scope = new Scope(scope_prototype)
+            {
                 VariableValues = new Dictionary<string, AssignedValue> {
                     {"model", new AssignedValue(JToken.Parse("\"black\""))}
                 }

@@ -7,7 +7,7 @@ namespace TKOM.Structures.IR
 {
     public class HtmlTagInstruction : Instruction
     {
-        public HtmlTagInstruction(Scope scope, HtmlTag htmlTag) : base(scope)
+        public HtmlTagInstruction(ScopePrototype scopePrototype, HtmlTag htmlTag) : base(scopePrototype)
         {
             HtmlTag = htmlTag;
             Block = new List<Executable>();
@@ -17,17 +17,51 @@ namespace TKOM.Structures.IR
         public List<Executable> Block { set; get; }
 
 
-        public override void Execute(StreamWriter streamWriter, Dictionary<string, Block> functions, int nestedLevel, bool newLine)
+        public override void Execute(Node node)
         {
-            base.Execute(streamWriter, functions, nestedLevel, true);
-            streamWriter.Write($"<{HtmlTag.TagName}");
+            node.NewLine = true;
+            base.Execute(node);
+            node.StreamWriter.Write($"<{HtmlTag.TagName}");
             foreach (var attribute in HtmlTag.Attributes)
             {
-                streamWriter.Write($" {attribute.attributeName}=\"{StringValueBuilder.Build(attribute.attributeValue, Scope)}\"");
+                node.StreamWriter.Write($" {attribute.attributeName}=\"{StringValueBuilder.Build(attribute.attributeValue, node.Scope)}\"");
             }
-            streamWriter.Write($">");
-            PerformBlock(Block, streamWriter, functions, nestedLevel, newLine);
-            streamWriter.Write($"</{HtmlTag.TagName}>");
+            node.StreamWriter.Write($">");
+            PerformBlock(node);
+            node.StreamWriter.Write($"</{HtmlTag.TagName}>");
+        }
+
+        protected void PerformBlock(Node node)
+        {
+            if (Block.Count() == 0)
+            {
+                return;
+            }
+            if ((Block.Count() == 1 &&
+                    (Block.First().GetType() == typeof(StringComponentInstruction)
+                    || Block.First().GetType() == typeof(IfInstruction)
+                    || Block.First().GetType() == typeof(FunctionCallInstruction)
+                    || Block.First().GetType() == typeof(ForInstruction)))
+                || (Block.All(i => i.GetType() == typeof(StringComponentInstruction))))
+            {
+                foreach (var instrucion in Block)
+                {
+                    var newNode = new Node(node);
+                    newNode.NewLine = false;
+                    instrucion.Execute(newNode);
+                }
+            }
+            else
+            {
+                foreach (var instrucion in Block)
+                {
+                    var newNode = new Node(node);
+                    newNode.NewLine = true;
+                    newNode.NestedLevel += 1;
+                    instrucion.Execute(newNode);
+                }
+                Format(node.StreamWriter, node.NestedLevel, true);
+            }
         }
 
     }

@@ -10,9 +10,7 @@ namespace TKOM.Structures.AST
 
         public bool EvaluateCondition(Scope scope)
         {
-            var lhsInstruction = new ValueOfInstruction(scope, LeftHandSideVariable);
-            var lhsToken = lhsInstruction.ReturnValue();
-
+            var lhsToken = scope.FindValueOfValueOf(LeftHandSideVariable);
             return RightHandSideVariable.PerformComparisonOnRhs(lhsToken, ConditionType, scope);
         }
     }

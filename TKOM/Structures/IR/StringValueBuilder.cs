@@ -11,15 +11,7 @@ namespace TKOM.Structures.IR
             var parsedStringValueBuilder = new StringBuilder();
             foreach (var value in stringValue.StringComponents)
             {
-                if (value.GetType() == typeof(Literal))
-                {
-                    parsedStringValueBuilder.Append(((Literal)value).Content);
-                }
-                else if (value.GetType() == typeof(ValueOf))
-                {
-                    var valueOfInstruction = new ValueOfInstruction(scope, (ValueOf)value);
-                    parsedStringValueBuilder.Append(valueOfInstruction.ReturnValue());
-                }
+                parsedStringValueBuilder.Append(value.GetValue(scope));
             }
             return parsedStringValueBuilder.ToString();
         }

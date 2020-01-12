@@ -5,9 +5,9 @@ namespace TKOM.Structures.IR
 {
     public abstract class Instruction : Executable
     {
-        public Instruction(Scope scope)
+        public Instruction(ScopePrototype scopePrototype)
         {
-            Scope = scope;
+            ScopePrototype = scopePrototype;
         }
     }
 }

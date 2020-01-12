@@ -39,10 +39,10 @@ namespace TKOM.Test.Tools
             Assert.Single(ir);
             var mainBlock = ir.First().Value;
             Assert.Single(mainBlock.NestedBlocks);
-            Assert.Single(mainBlock.Scope.Variables);
-            Assert.Equal("model", mainBlock.Scope.Variables.First());
-            Assert.Single(mainBlock.NestedBlocks.First().Scope.Variables);
-            Assert.Equal("model", mainBlock.NestedBlocks.First().Scope.Variables.First());
+            Assert.Single(mainBlock.ScopePrototype.Variables);
+            Assert.Equal("model", mainBlock.ScopePrototype.Variables.First());
+            Assert.Single(mainBlock.NestedBlocks.First().ScopePrototype.Variables);
+            Assert.Equal("model", mainBlock.NestedBlocks.First().ScopePrototype.Variables.First());
         }
 
         [Fact]
@@ -240,14 +240,14 @@ namespace TKOM.Test.Tools
             var mainBlock = ir.First().Value;
             var functionBlock = ir.Skip(1).First().Value;
             Assert.Equal(2, mainBlock.NestedBlocks.Count());
-            Assert.Single(mainBlock.Scope.Variables);
-            Assert.Equal("model", mainBlock.Scope.Variables.First());
-            Assert.Single(mainBlock.NestedBlocks.First().Scope.Variables);
-            Assert.Equal("model", mainBlock.NestedBlocks.First().Scope.Variables.First());
+            Assert.Single(mainBlock.ScopePrototype.Variables);
+            Assert.Equal("model", mainBlock.ScopePrototype.Variables.First());
+            Assert.Single(mainBlock.NestedBlocks.First().ScopePrototype.Variables);
+            Assert.Equal("model", mainBlock.NestedBlocks.First().ScopePrototype.Variables.First());
 
             Assert.Single(functionBlock.NestedBlocks);
-            Assert.Equal(2, functionBlock.Scope.Variables.Count());
-            Assert.Equal("argument", functionBlock.Scope.Variables.First());
+            Assert.Equal(2, functionBlock.ScopePrototype.Variables.Count());
+            Assert.Equal("argument", functionBlock.ScopePrototype.Variables.First());
         }
 
         [Fact]
@@ -289,8 +289,8 @@ namespace TKOM.Test.Tools
             Assert.Single(ir.First().Value.NestedBlocks);
 
             var for_instr = (ForInstruction) ir.First().Value.NestedBlocks.First();
-            Assert.Single(for_instr.Block.Scope.Variables);
-            Assert.NotNull(for_instr.Block.Scope.UpperScope);
+            Assert.Single(for_instr.Block.ScopePrototype.Variables);
+            Assert.NotNull(for_instr.Block.ScopePrototype.UpperScopePrototype);
         }
     }
 }
