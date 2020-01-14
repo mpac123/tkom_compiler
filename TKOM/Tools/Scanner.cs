@@ -206,7 +206,7 @@ namespace TKOM.Tools
             {
                 if (_reader.CurrentSign == '.' || _reader.CurrentSign == ' '
                     || _reader.CurrentSign == ')' || _reader.CurrentSign == ']'
-                    || _reader.CurrentSign == ',')
+                    || _reader.CurrentSign == ',' || _reader.CurrentSign == -1)
                 {
                     Token = new Token(TokenType.Number, buffer.ToString(), line, column);
                     return true;
@@ -238,7 +238,8 @@ namespace TKOM.Tools
                     || _reader.CurrentSign == '(' || _reader.CurrentSign == ','
                     || _reader.CurrentSign == '}' || _reader.CurrentSign == '\n'
                     || _reader.CurrentSign == '\r' || _reader.CurrentSign == '>'
-                    || _reader.CurrentSign == '/' || _reader.CurrentSign == '=')
+                    || _reader.CurrentSign == '/' || _reader.CurrentSign == '='
+                    || _reader.CurrentSign == -1)
                 {
                     Token = new Token(TokenType.Identifier, buffer.ToString(), line, column);
                     return true;
